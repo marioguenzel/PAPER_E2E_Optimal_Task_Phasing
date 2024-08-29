@@ -1,0 +1,157 @@
+\documentclass[conference]{resources/IEEEtran}
+
+%%% Start Preamble
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\AtBeginDocument{%
+	\providecommand\BibTeX{{%
+			\normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+\usepackage{hyperref}
+\usepackage{cite}
+
+\usepackage{amsmath,amssymb,amsfonts} %amsmath already included
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithmicx, algorithm}
+\usepackage{graphicx} %graphicx already included
+\usepackage{textcomp}
+\usepackage{xcolor}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,decorations.markings, positioning}
+\usepackage{subcaption}
+\usepackage{tabu}
+
+\hyphenation{con-straints}
+%\pagestyle{plain}
+
+%% COMMANDS:
+\usepackage{resources/mathcommands}
+
+%% DRAW SCHEDULES:
+\usepackage{resources/scheduling}
+
+%% THEOREMS:
+% Theorems --
+\usepackage{amsthm}
+
+\newtheorem{thm}{Theorem}%[section]
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{obs}[thm]{Observation}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{notn}[thm]{Notation}
+
+\theoremstyle{remark}
+\newtheorem{rmk}[thm]{Remark}
+\newtheorem{exmpl}[thm]{Example}
+% --
+
+
+%% WRITING:
+\newcommand{\comment}[3]{{\color{#1}#2:#3}\ClassWarning{}{There are comments left in the paper. [Remove them before submission!]}}
+\newcommand{\mario}[1]{\comment{red}{mg}{#1}}
+\newcommand{\kuan}[1]{\comment{blue}{kh}{#1}}
+\newcommand{\jj}[1]{\comment{orange}{jj}{#1}}
+
+\usepackage{lineno}
+%\usepackage[switch]{lineno}
+\linenumbers
+% fix problem with line numbering around align
+\makeatletter
+\let\LN@align\align
+\let\LN@endalign\endalign
+\renewcommand{\align}{\linenomath\LN@align}
+\renewcommand{\endalign}{\LN@endalign\endlinenomath}
+\makeatother
+
+
+%% PAPER SPECIFIC:
+
+
+%%% End Preamble
+
+
+
+
+\begin{document}
+	%% TITLE:
+	\title{Optimal Task Phasing for End-To-End Latency in Semi-Harmonic Task Systems}
+	
+	%% AUTHORS: Mario, Matthias
+	
+%	% Final version
+%	\author{
+%		\IEEEauthorblockN{First Author, Second Author and Third Author}
+%		\IEEEauthorblockA{TU Dortmund University\\
+%			Email: \{first.author, second.author, third.author\}@tu-dortmund.de}
+%		\and
+%		\IEEEauthorblockN{Other Author}
+%		\IEEEauthorblockA{Other University\\
+%			Email: other.author@other-university.de}
+%		}
+	
+%	% Submission version:
+	\author{RTAS 2025 Submission \# \textcolor{red}{TBD} \quad\quad\quad Pages: \pageref{last-page}}
+	
+	\maketitle
+
+	\begin{abstract}
+		ABSTRACT
+		- introductory sentence to the topic (optional)
+		- describe the issue or main problem (create a need)
+		- one sentence detailing your approach (meet the need)
+		- list main research results
+		- finish with MAIN MESSAGE of the paper
+	\end{abstract} 
+	
+%	\vspace{-.2in}
+	
+	\section{Introduction}
+	\label{sec:introduction}
+	% General introduction
+
+	% Topic of this paper
+	
+	% Detailed topic / tell more details
+	
+	
+	% Contribution
+	\noindent\textbf{Contributions:} % short text
+	\begin{itemize}
+		\item one
+		\item two
+		\item three
+	\end{itemize}
+	
+	
+\section{System Model}
+\label{sec:system_model}
+
+\section{Problem Definition}
+\label{sec:problem_def}
+
+\section{Main Topic}
+
+\section{Evaluation}
+\label{sec:evaluation}
+	
+
+	
+%\vspace{-0.05in}
+\section{Conclusion}
+\label{sec:conclusion}
+	
+
+
+% bib
+\label{last-page}
+\clearpage
+%\bibliographystyle{abbrv}
+%\bibliography{real-time}
+	
+\end{document}
