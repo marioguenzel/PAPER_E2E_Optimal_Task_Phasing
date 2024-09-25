@@ -1,4 +1,4 @@
-\documentclass[conference]{resources/IEEEtran}
+\documentclass[10pt,conference]{resources/IEEEtran}
 
 %%% Start Preamble
 \usepackage[T1]{fontenc}
@@ -96,7 +96,7 @@
 
 \begin{document}
 	%% TITLE:
-	\title{Optimal Task Phasing for End-To-End Latency in Harmonic and Automotive Task Systems}
+	\title{Optimal Task Phasing for End-To-End Latency in Harmonic and Semi-Harmonic Automotive Systems}
 	
 	%% AUTHORS: Mario, Matthias
 	
@@ -130,6 +130,8 @@
 		% - finish with MAIN MESSAGE of the paper
 		We prove that our strategy is optimal in the sense that it minimizes the end-to-end latency.
 		Furthermore, our evaluation based on a real-world application shows that optimizing task phases can reduce end-to-end latencies significantly. 
+
+		\mario{11 pages of technical content + bib and ackn; Track 2}
 	\end{abstract} 
 	
 %	\vspace{-.2in}
@@ -853,7 +855,7 @@
 
 
 
-\section{Optimal Task Phasing for Automotive Systems}
+\section{Optimal Task Phasing for Semi-Harmonic Automotive Systems}
 
 	Look at task set with automotive periods 1,2,5,10,20,50,100,200,1000
 
@@ -876,12 +878,23 @@
 \section{Evaluation}
 \label{sec:evaluation}
 	
+	\mario{
+	Case Study based on WATERS 2017.
+
+	Synthetic Evaluation based on Automotive Benchmarks for free.
+	}
+
+	\mario{Messages: 
+	1 Our was always the best (verify optimality)
+	2 How much can we gain?
+	}
+
+
 	Apply our phasing in one or two real applications/ to workload based on real applications and report the gain. 
 
-
-	- ohne offset
-	- random offset
-	- unser offset 
+	- ohne phasing
+	- random phasing
+	- unser phasing 
 
 	- arbitrary phasing: use Matthias analysis (MRDA + one period)
 	
@@ -894,7 +907,7 @@
 % bib
 \label{last-page}
 \clearpage
-%\bibliographystyle{abbrv}
-%\bibliography{real-time}
+\bibliographystyle{abbrv}
+\bibliography{real-time}
 	
 \end{document}
