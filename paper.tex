@@ -125,6 +125,12 @@
 	% Topic of this paper
 	
 	% Detailed topic / tell more details
+
+
+	State of the art: Release all tasks at the same time
+
+
+	- Related work: Alessandro ECRTS
 	
 	
 	% Contribution
@@ -135,19 +141,58 @@
 		\item three
 	\end{itemize}
 	
-	
 \section{System Model}
 \label{sec:system_model}
 
+\section{Motivating Example}
+
+	Show that releasing all jobs at the same time is not optimal, and that you can get better results by manipulating phases.
+	
 \section{Problem Definition}
 \label{sec:problem_def}
 
-\section{Main Topic}
+	What is the best phasing? Nobody has looked into that yet. 
+
+\section{Optimal Task Phasing for Harmonic Systems}
+
+	Theorem: Phases need to be set at 
+
+
+	Proposition: How big is the gain that we get wrt synchronous?
+
+
+
+\section{Optimal Task Phasing for Semi-Harmonic Systems}
+
+	Look at task set with automotive periods 1,2,5,10,20,50,100,200,1000
+
+
+	Thm: If all periods divide the largest period, the strategy from previous section still optimal phasing.
+
+	If it does not divide, we need to make space bigger. We do that as follows \dots
+
+	- immer wenn von größter Periode das erste mal zu nicht harmonischer Periode, um die Hälfte schieben 
+
+	Thm: Optimal phasing with this strategy for automotive periods. 
+
+	Proof: 
+	- hyperperiod is at most twice as much, therefore at most two different partitioned job chains 
+	- Length at least sum of all + phasings from each non harmonic task 
+	- Can count number of times jumping from between non harmonic -> loosing at least one half every time 
+
+
 
 \section{Evaluation}
 \label{sec:evaluation}
 	
+	Apply our phasing in one or two real applications/ to workload based on real applications and report the gain. 
 
+
+	- ohne offset
+	- random offset
+	- unser offset 
+
+	- arbitrary phasing: use Matthias analysis (MRDA + one period)
 	
 %\vspace{-0.05in}
 \section{Conclusion}
