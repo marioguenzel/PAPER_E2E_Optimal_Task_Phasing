@@ -446,15 +446,14 @@
 \section{Motivating Example}
 
 	In this section, we demonstrate the impact of task phasing on the end-to-end latency. 
-	To that end, we consider an example cause-effect chain $E = (\tau_1 \to \tau_2 \to \tau_3)$ with 
+	To that end, we consider an example cause-effect chain $E = (\tau_1 \to \tau_2 \to \tau_3)$ with: 
 	\begin{itemize}
 		\item $\tau_1,\tau_3 \in \mathit{Per}(10)$
 		\item $\tau_2 \in \mathit{Per}(1)$.
 	\end{itemize}
-
-	The typical approach of making the task set synchronous, i.e., $\tau_1, \tau_2, \tau_3 \in \mathit{Phase}(0)$ leads to the schedule depicted in Figure 
-
-
+	%
+	The typical approach of making the task set synchronous, i.e., $\tau_1, \tau_2, \tau_3 \in \mathit{Phase}(0)$ leads to the schedule depicted in Figure~\ref{fig:motivation:synchronous}.
+	%
 	\begin{figure}
 		\centering
 		\subfloat[Synchronous: $\lat(E) = 40$.]{
@@ -551,7 +550,7 @@
 
 			\end{scope}
 			\end{tikzpicture}	
-		}\label{fig:motivation:synchronous}
+		\label{fig:motivation:synchronous}}
 		\\
 		\subfloat[Optimized phasing: $\lat(E) = 31$]{
 		\footnotesize
@@ -647,13 +646,22 @@
 
 			\end{scope}
 			\end{tikzpicture}	
-		}\label{fig:motivation:phasing}
+		\label{fig:motivation:phasing}}
 		\caption{Motivating example. The longest $1$-partitioned job chain is marked in gray. Changing the phase of task $\tau_3$ from $0$ to $1$ improves the end-to-end latency by $22.5\%$.}
 		\label{fig:motivation}
 	\end{figure}
+	%
+	The longest $1$-partitioned job chain is $\pc^1_1$, marked in gray. 
+	Therefore, the end-to-end latency is $\ell(\pc^1_1) = 40$ time units for the synchronous case.
+	
+	We observe in Figure~\ref{fig:motivation:synchronous}, that after the write-event of the gray job of $\tau_2$, the next read-event of task $\tau_3$ is time units later. 
+	Therefore, by moving the phase of $\tau_3$ from $0$ to $1$, we ensure that the data is read by task $\tau_3$ immediately after it was written by $\tau_2$.
+	Specifically, Figure~\ref{fig:motivation:phasing} depicts the case with modified phase $\tau_3 \in \mathit{Phase}(1)$.
+	The longest $1$-partitioned job chain has a length of $\ell(\pc^1_1) = 31$.
+	Therefore, the end-to-end latency for the case with modified phase is $\lat(E) = 31$.
+	We conclude that modifying the phase of $\tau_3$ by only $1$ time unit improved the end-to-end latency by $\frac{9}{40} = 22.5\%$.
 
-
-	Show that releasing all jobs at the same time is not optimal, and that you can get better results by manipulating phases.
+	
 	
 \section{Problem Definition}
 \label{sec:problem_def}
