@@ -101,7 +101,7 @@
 
 \begin{document}
 	%% TITLE:
-	\title{Optimal Task Phasing for End-To-End Latency in Harmonic and Semi-Harmonic Automotive Systems}
+	\title{Optimal Task Phasing for End-To-End Latency in Harmonic Systems and Semi-Harmonic Automotive Systems}
 	
 	%% AUTHORS: Mario, Matthias
 	
@@ -156,6 +156,11 @@
 	- Related work: Alessandro ECRTS
 
 	\mario{This is the first work that exploits partitioned job chains analytically after their initial exploration in \cite{DBLP:conf/ecrts/GunzelTCBC23}.}
+
+
+	\mario{TODO:
+	- We use task set and task system interchangably, and say the task set/task system/system is harmonic. We need to make the language consistent.
+	}
 	
 	
 	% Contribution
@@ -185,15 +190,18 @@
 	We consider implicit-deadline tasks where the deadline of each job is at the release of the subsequent job, i.e., the deadline of $\tau(m)$ is at $\phi_\tau + (m+1) T_{\tau}$.
 
 	Task systems are \emph{harmonic} if all task periods are integer multiples of one another.
-	That is, for any two tasks $\tau, \tau' \in \Tbb$, we have $\frac{T_{\tau}}{T_{\tau'}} \in \Nbb$ or $\frac{T_{\tau'}}{T_{\tau}} \in \Nbb$.
+	That is, for any two tasks $\tau, \tau' \in \Tbb$, we have 
+	\begin{equation}
+		\frac{T_{\tau}}{T_{\tau'}} \in \Nbb \qquad \text{or} \qquad \frac{T_{\tau'}}{T_{\tau}} \in \Nbb.
+	\end{equation}
 	Harmonic task systems have the benefit that their release pattern is highly repetitive. As a result, the data propagation through these tasks is easier to analyze and to control.
 	For the results of this work, weaker forms of harmonic are already sufficient.
-	Specifically, in Section~\ref{sec:harmonic}, we consider \emph{max-harmonic} tasks, where 
+	Specifically, in Section~\ref{sec:harmonic}, we consider \emph{max-harmonic} subsets $\Tbb' \subseteq \Tbb$, where 
 	\begin{equation}
-		\frac{T_{\mathit{max}}}{T_{\tau}} \in \Nbb
+		\frac{\max_{\tau\in \Tbb'} T_{\tau}}{T_{\tau}} \in \Nbb
 	\end{equation}
-	for all $\tau \in \Tbb$, with $T_{\mathit{max}} := \max_{\tau\in \Tbb} T_{\tau}$. 
-	For the results in Section~\ref{sec:automotive}, we consider semi-harmonic task sets with 
+	for all $\tau \in \Tbb'$. 
+	For the results in Section~\ref{sec:automotive}, we consider semi-harmonic task sets $\Tbb$ with 
 	\begin{equation}
 		T_\tau \in \setof{1,2,5,10,20,50,100,200,1000}
 	\end{equation}
@@ -656,30 +664,44 @@
 	Therefore, the end-to-end latency for the case with modified phase is $\lat(E) = 31$.
 	We conclude that modifying the phase of $\tau_3$ by only $1$ time unit improved the end-to-end latency by $\frac{9}{40} = 22.5\%$.
 
-	
-	
-\section{Problem Definition}
-\label{sec:problem_def}
+% \section{Problem Definition}
+% \label{sec:problem_def}
 
-	What is the best phasing? Nobody has looked into that yet. 
+% 	What is the best phasing? Nobody has looked into that yet. 
 
-\section{Optimal Task Phasing for Harmonic Systems and Max-Harmonic Systems}
+\section{Optimal Task Phasing for Harmonic Systems}
 \label{sec:harmonic}
-
-
-	Indeed, the results of this section work even for a larger class of task systems. 
+	
+	As the motivating example demonstrates, there is a high potential of reducing the end-to-end latency by modifying the task phases. 
+	In this section, we
+	consider a cause-effect chain 
+	\begin{equation}
+		E = (\tau_1 \to\dots\to \tau_n),
+	\end{equation}
+	and
+	explore optimal task phasing 
+	that minimizes $\lat(E)$ if the system is harmonic.
+	Actually, the results of this section work even for a larger class of task systems, in which the tasks 
+	\begin{equation}
+		\Tbb_E := \setof{\tau_1, \dots, \tau_n} \subseteq \Tbb
+	\end{equation}
+	of the cause-effect chain $E$ are \emph{max-harmonic}. 
 	
 	\begin{definition}[Max-Harmonic]
-		A task system is called \emph{max-harmonic} if all periods divide the largest period, i.e., 
+		A task set $\Tbb' \subseteq \Tbb$ is called \emph{max-harmonic} if all periods divide the largest period, i.e., 
 		\begin{equation}
-			\frac{T_{\mathit{max}}}{T_{\tau_i}} \in \Nbb
+			\frac{\max_{\tau\in \Tbb'} T_{\tau}}{T_{\tau}} \in \Nbb
 		\end{equation}
-		for all $\tau_i \in \Tbb$, where $T_{\mathit{max}} := \max_{\tau\in \Tbb} T_{\tau}$.
+		for all $\tau \in \Tbb'$.
 	\end{definition}
 
-	\begin{lemma}[Optimality of task phasing]
+	Naturally, if $\Tbb$ is harmonic, then $\Tbb$ and all its subsets $\Tbb' \subseteq \Tbb$ are also max-harmonic. 
+	In particular, $\Tbb_E$ is max-harmonic.
+	
+	To develop an optimal task phasing strategy, we first formulate a general lower bound on the end-to-end latency. 
+
+	\begin{lemma}
 		The end-to-end latency of $E$ under \emph{any} task phasing is lower bounded by $\sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}$.
-		Hence, the task phasing from Theorem~\ref{thm:key} is optimal.
 	\end{lemma}
 
 	\begin{proof}
@@ -718,6 +740,12 @@
 		%
 		Since the task phasing $\phi_{\tau_i} = \sum_{\xi=1}^{i-1} T_{\tau_\xi}$ achieves the minimal end-to-end latency, as stated in Theorem~\ref{thm:key}, this phasing is optimal.
 	\end{proof}
+
+	In the following, we develop a task phasing that ensures that the end-to-end latency reaches this lower bound for max-harmonic tasks. 
+
+
+	\mario{HERE}
+
 
 	\begin{lemma}\label{lem:key_lemma}
 		If $\setof{\tau_1, \dots, \tau_n}$ is semi-harmonic (in the sense as described in Section~\ref{sec:system_model}), then 
@@ -1072,6 +1100,8 @@
 
 	Proposition: How big is the gain that we get wrt synchronous?
 
+
+	\mario{Note: The lower bound is formulated for the general case. For max-harmonic tasks, we have shown that the lower bound is tight.}
 
 
 \section{Optimal Task Phasing for Semi-Harmonic Automotive Systems}
