@@ -426,15 +426,25 @@
 
 
 \section{Motivating Example}
+\label{sec:motivation}
 
 	In this section, we demonstrate the impact of task phasing on the end-to-end latency. 
 	To that end, we consider an example cause-effect chain $E = (\tau_1 \to \tau_2 \to \tau_3)$ with: 
-	\begin{itemize}
-		\item $\tau_1,\tau_3 \in \mathit{Per}(10)$
-		\item $\tau_2 \in \mathit{Per}(1)$.
-	\end{itemize}
+	\begin{equation}
+		T_{\tau_1} = 10, \qquad T_{\tau_2}=1, \qquad T_{\tau_3}=10
+	\end{equation}
+	% \begin{itemize}
+	% 	\item $T_1 = 10$
+	% 	\item $T_2 = 1$
+	% 	\item $T_3 = 10$
+	% \end{itemize}
 	%
-	The typical approach of making the task set synchronous, i.e., $\tau_1, \tau_2, \tau_3 \in \mathit{Phase}(0)$ leads to the schedule depicted in Figure~\ref{fig:motivation:synchronous}.
+	The typical approach of making the task set synchronous, i.e., 
+	\begin{equation}
+		\phi_{\tau_1} = \phi_{\tau_2} = \phi_{\tau_3} = 0 
+	\end{equation}
+	% $\tau_1, \tau_2, \tau_3 \in \mathit{Phase}(0)$ 
+	leads to the schedule depicted in Figure~\ref{fig:motivation:synchronous}.
 	%
 	\begin{figure}
 		\centering
@@ -638,7 +648,10 @@
 	
 	We observe in Figure~\ref{fig:motivation:synchronous}, that after the write-event of the gray job of $\tau_2$, the next read-event of task $\tau_3$ is time units later. 
 	Therefore, by moving the phase of $\tau_3$ from $0$ to $1$, we ensure that the data is read by task $\tau_3$ immediately after it was written by $\tau_2$.
-	Specifically, Figure~\ref{fig:motivation:phasing} depicts the case with modified phase $\tau_3 \in \mathit{Phase}(1)$.
+	Specifically, Figure~\ref{fig:motivation:phasing} depicts the case with modified phases:
+	\begin{equation}
+		\phi_{\tau_1} = \phi_{\tau_2} = 0 , \qquad  \phi_{\tau_3} = 1
+	\end{equation} 
 	The longest $1$-partitioned job chain has a length of $\ell(\pc^1_1) = 31$.
 	Therefore, the end-to-end latency for the case with modified phase is $\lat(E) = 31$.
 	We conclude that modifying the phase of $\tau_3$ by only $1$ time unit improved the end-to-end latency by $\frac{9}{40} = 22.5\%$.
