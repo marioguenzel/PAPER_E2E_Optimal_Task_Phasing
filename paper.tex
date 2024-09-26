@@ -36,19 +36,24 @@
 % Theorems --
 \usepackage{amsthm}
 
-\newtheorem{thm}{Theorem}%[section]
-\newtheorem{prop}[thm]{Proposition}
-\newtheorem{lem}[thm]{Lemma}
-\newtheorem{cor}[thm]{Corollary}
-\newtheorem{obs}[thm]{Observation}
+\newtheorem{theorem}{Theorem}%[section]
+% \newtheorem{prop}[thm]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+% \newtheorem{obs}[thm]{Observation}
 
 \theoremstyle{definition}
-\newtheorem{defn}[thm]{Definition}
-\newtheorem{notn}[thm]{Notation}
+\newtheorem{definition}[theorem]{Definition}
+% \newtheorem{notn}[thm]{Notation}
 
-\theoremstyle{remark}
-\newtheorem{rmk}[thm]{Remark}
-\newtheorem{exmpl}[thm]{Example}
+% \theoremstyle{remark}
+% \newtheorem{rmk}[thm]{Remark}
+% \newtheorem{exmpl}[thm]{Example}
+
+%\newtheorem{prog}[theorem]{Programming}
+% \newtheorem{prog}{Programming}
+
+% \newtheorem{corollary}{Corollary}
 % --
 
 
@@ -85,12 +90,7 @@
 \newcommand{\bc}{\bw{c}}
 \newcommand{\pc}{{pc}}
 
-\newtheorem{lemma}{Lemma}
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
-\newtheorem{theorem}{Theorem}
-%\newtheorem{prog}[theorem]{Programming}
-\newtheorem{prog}{Programming}
+
 
 
 
@@ -695,67 +695,24 @@
 		for all $\tau \in \Tbb'$.
 	\end{definition}
 
-	Naturally, if $\Tbb$ is harmonic, then $\Tbb$ and all its subsets $\Tbb' \subseteq \Tbb$ are also max-harmonic. 
-	In particular, $\Tbb_E$ is max-harmonic.
+	Naturally, if $\Tbb$ is harmonic, then $\Tbb$ and all its subsets $\Tbb' \subseteq \Tbb$, including $\Tbb_E$, are max-harmonic. 
 	
-	To develop an optimal task phasing strategy, we first formulate a general lower bound on the end-to-end latency. 
-
-	\begin{lemma}
-		The end-to-end latency of $E$ under \emph{any} task phasing is lower bounded by $\sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}$.
-	\end{lemma}
-
-	\begin{proof}
-		Let $p\in \setof{1, \dots, n}$ such that $\tau_p$ is the task with the maximal period, i.e., $T_{\tau_p} = \max_{i=1, \dots, n} T_{\tau_i}$.
-		Consider any $p$-partitioned job chain $\pc^p_m = (\bc_m,\fc_{m+1})$.
-		We denote the immediate backward job chain by $\bc_m = (\tau_1(j_1) \to\dots\to \tau_p(j_p))$ and the immediate forward job chain by $\fc_{m+1} = (\tau_p(j'_p) \to\dots\to \tau_n(j'_n))$.
-		%
-		The length of $\pc^p_m$ can be expressed by:
-		\begin{align}
-			\ell(\pc^p_m) &= \we(\tau_n(j'_n)) - \re(\tau_1(j_1))
-			\\& = \we(\tau_n(j'_n)) - \we(\tau_p(j'_p)) \label{eq:summand1}
-			\\& \phantom{=} + \we(\tau_p(j'_p)) - \re(\tau_p(j_p)) \label{eq:summand2}
-			\\& \phantom{=} + \re(\tau_p(j_p)) - \re(\tau_1(j_1)) \label{eq:summand3}
-		\end{align}
-		In the following we investigate each summand (Equations~\eqref{eq:summand1},~\eqref{eq:summand2},~\eqref{eq:summand3}) individually.
-
-		\textbf{Summand of Equation~\eqref{eq:summand1}:}
-		Equally, this summand can be written as the sum
-		$\eqref{eq:summand1} = \sum_{i=p+1}^{n} (\we(\tau_i(j'_i)) - \we(\tau_{i-1}(j'_{i-1})))$.
-		We use the property $\we(\tau_{i-1}(j'_{i-1})) \leq \re(\tau_i(j'_i))$ of immediate forward job chains to bound \eqref{eq:summand1} from below by 
-		$\eqref{eq:summand1} \geq \sum_{i=p+1}^{n} (\we(\tau_i(j'_i)) - \re(\tau_{i}(j'_{i})))$.
-		Since $\we(\tau_i(j'_i)) - \re(\tau_{i}(j'_{i})) = T_{\tau_i}$, we obtain $\eqref{eq:summand1} \geq \sum_{i=p+1}^{n} T_{\tau_i}$.
-
-		\textbf{Summand of Equation~\eqref{eq:summand2}:}
-		By definition, $j_p = m$ and $j'_p = m+1$.
-		Therefore, $\eqref{eq:summand2} = (\phi_{\tau_p} + (m+1+1) \cdot T_{\tau_p}) - (\phi_{\tau_p} + m \cdot T_{\tau_p}) = 2\cdot T_{\tau_p}$.
-
-		\textbf{Summand of Equation~\eqref{eq:summand3}:}
-		This summand is
-		$\eqref{eq:summand3} = \sum_{i=1}^{p-1} ( \re(\tau_{i+1}(j_{i+1})) - \re(\tau_i(j_i)) )$.
-		We use the property $\re(\tau_{i+1}(j_{i+1})) \geq \we(\tau_i(j_i))$ of immediate backward job chains to achieve
-		$\eqref{eq:summand3} \geq \sum_{i=1}^{p-1} ( \we(\tau_i(j_i)) - \re(\tau_i(j_i)) ) = \sum_{i=1}^{p-1} T_{\tau_i}$.
-
-		We conclude $\ell(\pc^p_m) = \eqref{eq:summand1} + \eqref{eq:summand2} + \eqref{eq:summand3} \geq \sum_{i=1}^{n} T_{\tau_i} + T_{\tau_p} = \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}$.
-		Hence, $\lat(E) =\sup_{m\geq W_p} \ell(\pc^p_m) \geq \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}$ under any task phasing.
-		%
-		Since the task phasing $\phi_{\tau_i} = \sum_{\xi=1}^{i-1} T_{\tau_\xi}$ achieves the minimal end-to-end latency, as stated in Theorem~\ref{thm:key}, this phasing is optimal.
-	\end{proof}
-
-	In the following, we develop a task phasing that ensures that the end-to-end latency reaches this lower bound for max-harmonic tasks. 
-
-
 	\mario{HERE}
 
-
 	\begin{lemma}\label{lem:key_lemma}
-		If $\setof{\tau_1, \dots, \tau_n}$ is semi-harmonic (in the sense as described in Section~\ref{sec:system_model}), then 
+		Let $\tau_p$ be the task with the highest period of $E$, i.e., $T_{\tau_p} = \max_{i=1, \dots, n} T_{\tau_i}$.
+		If $\Tbb_E$ is max-harmonic, then 
 		\begin{equation}
 			\ell(\pc^p_{W_p}) 
 			= \ell(\pc^p_{W_p+1}) 
 			= \ell(\pc^p_{W_p+2})
 			= \dots 
 		\end{equation}
-		where $\tau_p$ is the task with the highest period, i.e., $T_{\tau_p} = \max_{i=1, \dots, n} T_{\tau_i}$.
+		In particular,  
+		\begin{math}
+			\lat(E) = \ell(\pc^p_{W_p}) 
+		\end{math}
+		holds.
 	\end{lemma}
 
 	\begin{proof}
@@ -799,7 +756,7 @@
 		% 	\\& \overset{\text{(a)}}{=} \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1 + \frac{T_{\tau_p}}{T_{\tau_i}}
 		% 	= j_{i-1} + \frac{T_{\tau_p}}{T_{\tau_i}}
 		% \end{align}
-		where (a) holds because $\frac{T_{\tau_p}}{T_{\tau_i}} \in \Nbb$ by the semi-harmonic property. \qed~Equation~\eqref{eq:induction1}
+		where (a) holds because $\frac{T_{\tau_p}}{T_{\tau_i}} \in \Nbb$ by the max-harmonic property. \qed~Equation~\eqref{eq:induction1}
 
 		In the following we investigate the immediate forward chains, which we denote by
 		$\fc_{m+1} = (\tau_p(j'_p) \to\dots\to \tau_n(j'_n))$ and $\fc_{m+2} = (\tau_p(\tilde{j}'_p) \to\dots\to \tau_n({\tilde{j}'}_n))$.
@@ -856,7 +813,7 @@
 		% 	= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
 		% 	= j'_{i+1} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
 		% \end{align}
-		where $\frac{T_{\tau_p}}{T_{\tau_{i+1}}} \in \Nbb$ because the periods are semi-harmonic.
+		where $\frac{T_{\tau_p}}{T_{\tau_{i+1}}} \in \Nbb$ because the periods are max-harmonic.
 		\qed~Equation~\eqref{eq:induction2}
 
 		We conclude that $j_1 + \frac{T_{\tau_p}}{T_{\tau_1}} = \tilde{j}_1$ by Equation~\eqref{eq:induction1} and $j'_n + \frac{T_{\tau_p}}{T_{\tau_n}} = \tilde{j}'_n$ by Equation~\eqref{eq:induction2}.
@@ -871,13 +828,19 @@
 		as desired.
 	\end{proof}
 
-	Due to the previous lemma, $\lat(E) = \ell(\pc^p_{W_p})$.
-	Hence, to minimize the end-to-end latency, it is sufficient to choose phases which minimize the \emph{first} partitioned job chain. 
-	In the following we \textbf{set the task phases to}
-	\begin{equation}
-		\phi_{\tau_i} = \sum_{\xi=1}^{i-1} T_{\tau_\xi},
-	\end{equation}
-	as illustrated in Figure~\ref{fig:phasing}.
+	The previous lemma indicates that, to minimize the end-to-end latency, it is sufficient to choose phases which minimize the \emph{first} partitioned job chain.
+	We achieve that, by ensuring that there is no slack between read- and write-events of $\pc^p_{W_p}$.
+	In particular, we consider the following task phasing.
+
+	\begin{definition}[Suggested Phasing for Max-Harmonic]\label{def:phasing_max_harm}
+		For the cause-effect chain $E= (\tau_1 \to\dots\to \tau_n)$, we define a task phasing
+		\begin{equation}\label{eq:phasing}
+			\phi^{\mathit{MH}}_{\tau_i} = \sum_{\xi=1}^{i-1} T_{\tau_\xi},
+		\end{equation}
+		for all $\tau_i \in \Tbb_E$.
+	\end{definition}
+	
+	The phasing is illustrated in Figure~\ref{fig:phasing}.
 	\begin{figure}
 		\centering
 		\footnotesize
@@ -1010,18 +973,16 @@
 			\caption{Phase enforcement. The first $3$-partitioned job chain for $E=(\tau_1 \to \tau_2 \to \dots \to \tau_5)$ are marked in gray.}
 			\label{fig:phasing}
 	\end{figure}
-	From the figure we observe that the read- and write-event of subsequent jobs coincide for the first $p$-partitioned job chain, which minimizes the length of that job chain.
-	In the following theorem we calculate the end-to-end latency of the task set with the specified task phases. 
-	Afterwards, we discuss the optimality of that task phasing.
+	Indeed, we observe that the read- and write-event of subsequent jobs coincide for the first $p$-partitioned job chain, which minimizes the length of that job chain.
+	Specifically, the end-to-end latency under the suggested task phasing for max-harmonic systems is as follows.
 
-	\begin{theorem}[End-to-end latency with task phasing]\label{thm:key}
-		If ${\tau_1, \dots, \tau_n}$ is semi-harmonic and the task offsets are chosen as $\phi_{\tau_i} = \sum_{\xi=1}^{i-1} T_{\tau_\xi}$, then 
+	\begin{theorem}[End-to-end latency with suggested phasing]\label{thm:e2e_with_phasing_harm}
+		If $\Tbb_E$ is max-harmonic and the task offsets are chosen as $\phi_{\tau_i} = \phi^{\mathit{MH}}_{\tau_i}$, then 
 		\begin{equation}
-			\lat(E) = \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}
+			\lat(E) = \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}.
 		\end{equation}
 	\end{theorem}
 
-	\mario{Instead, this theorem should be about that the end-to-end latency becomes optimal}
 
 	\begin{proof}
 		Let $p \in \setof{1, \dots, n}$ such that $\tau_p$ is the task with the maximal period, i.e., $T_{\tau_p} = \max_{i=1, \dots, n} T_{\tau_i}$.
@@ -1095,11 +1056,66 @@
 		$\lat(E) = \ell(\pc^p_0) = \sum_{i=1}^{n} T_{\tau_i} + T_{\tau_p} = \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}$.
 	\end{proof}
 
-	Theorem: Phases need to be set at 
+	In the following, we show that the suggested phasing is optimal.
+	To that end, we formulate a general lower bound on the end-to-end latency.
 
+	\begin{lemma}\label{lem:lower_bound_general}
+		The end-to-end latency of $E$ under \emph{any} task phasing is lower bounded by 
+		\begin{equation}
+			\lat(E) \geq \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}.
+		\end{equation}
+	\end{lemma}
 
-	Proposition: How big is the gain that we get wrt synchronous?
+	\begin{proof}
+		Let $p\in \setof{1, \dots, n}$ such that $\tau_p$ is the task with the maximal period, i.e., $T_{\tau_p} = \max_{i=1, \dots, n} T_{\tau_i}$.
+		Consider any $p$-partitioned job chain $\pc^p_m = (\bc_m,\fc_{m+1})$.
+		We denote the immediate backward job chain by $\bc_m = (\tau_1(j_1) \to\dots\to \tau_p(j_p))$ and the immediate forward job chain by $\fc_{m+1} = (\tau_p(j'_p) \to\dots\to \tau_n(j'_n))$.
+		%
+		The length of $\pc^p_m$ can be expressed by:
+		\begin{align}
+			\ell(\pc^p_m) &= \we(\tau_n(j'_n)) - \re(\tau_1(j_1))
+			\\& = \we(\tau_n(j'_n)) - \we(\tau_p(j'_p)) \label{eq:summand1}
+			\\& \phantom{=} + \we(\tau_p(j'_p)) - \re(\tau_p(j_p)) \label{eq:summand2}
+			\\& \phantom{=} + \re(\tau_p(j_p)) - \re(\tau_1(j_1)) \label{eq:summand3}
+		\end{align}
+		In the following we investigate each summand (Equations~\eqref{eq:summand1},~\eqref{eq:summand2},~\eqref{eq:summand3}) individually.
 
+		\smallskip
+		\textbf{Summand of Equation~\eqref{eq:summand1}:}
+		Equally, this summand can be written as the sum
+		$\eqref{eq:summand1} = \sum_{i=p+1}^{n} (\we(\tau_i(j'_i)) - \we(\tau_{i-1}(j'_{i-1})))$.
+		We use the property $\we(\tau_{i-1}(j'_{i-1})) \leq \re(\tau_i(j'_i))$ of immediate forward job chains to bound \eqref{eq:summand1} from below by 
+		$\eqref{eq:summand1} \geq \sum_{i=p+1}^{n} (\we(\tau_i(j'_i)) - \re(\tau_{i}(j'_{i})))$.
+		Since $\we(\tau_i(j'_i)) - \re(\tau_{i}(j'_{i})) = T_{\tau_i}$, we obtain $\eqref{eq:summand1} \geq \sum_{i=p+1}^{n} T_{\tau_i}$.
+
+		\smallskip
+		\textbf{Summand of Equation~\eqref{eq:summand2}:}
+		By definition, $j_p = m$ and $j'_p = m+1$.
+		Therefore, $\eqref{eq:summand2} = (\phi_{\tau_p} + (m+1+1) \cdot T_{\tau_p}) - (\phi_{\tau_p} + m \cdot T_{\tau_p}) = 2\cdot T_{\tau_p}$.
+
+		\smallskip
+		\textbf{Summand of Equation~\eqref{eq:summand3}:}
+		This summand is
+		$\eqref{eq:summand3} = \sum_{i=1}^{p-1} ( \re(\tau_{i+1}(j_{i+1})) - \re(\tau_i(j_i)) )$.
+		We use the property $\re(\tau_{i+1}(j_{i+1})) \geq \we(\tau_i(j_i))$ of immediate backward job chains to achieve
+		$\eqref{eq:summand3} \geq \sum_{i=1}^{p-1} ( \we(\tau_i(j_i)) - \re(\tau_i(j_i)) ) = \sum_{i=1}^{p-1} T_{\tau_i}$.
+
+		\smallskip
+		We conclude $\ell(\pc^p_m) = \eqref{eq:summand1} + \eqref{eq:summand2} + \eqref{eq:summand3} \geq \sum_{i=1}^{n} T_{\tau_i} + T_{\tau_p} = \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}$.
+		Hence, $\lat(E) =\sup_{m\geq W_p} \ell(\pc^p_m) \geq \sum_{i=1}^{n} T_{\tau_i} + \max_{i=1, \dots, n} T_{\tau_i}$ under any task phasing.
+	\end{proof}
+
+	Since the lower bound coincides with the end-to-end latency for max-harmonic systems with our suggested phasing, our phasing is optimal.
+
+	\begin{theorem}
+		The task phasing presented in Equation~\eqref{eq:phasing} is optimal in minimizing the end-to-end latency for max-harmonic systems.
+	\end{theorem}
+
+	\begin{proof}
+		Since the end-to-end latency under our proposed phasing (Theorem~\ref{thm:e2e_with_phasing_harm}) coincides with the lower bound under any phasing (Lemma~\ref{lem:lower_bound_general}), our task phasing is optimal.
+	\end{proof}
+
+	\mario{If we need to fill space we can evaluate how large the gap can become wrt to random phasing and synchronous phasing.}
 
 	\mario{Note: The lower bound is formulated for the general case. For max-harmonic tasks, we have shown that the lower bound is tight.}
 
