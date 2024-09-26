@@ -225,11 +225,13 @@
 
 
 \section{Cause-Effect Chains and End-to-End latencies}
+\label{sec:e2e}
 
-	A specific path in the data dependency graph is called a cause-effect chain $E$.
-	We denote a cause-effect chain by $E=(\tau_1 \to \dots \to \tau_n)$ for some $n\in \Nbb$.
-%
-	To ensure proper timely behavior of the system, each cause-effect chain is equipped with a timing requirement, i.e., an upper bound $B \in \Rbb>0$ on the \emph{end-to-end latency} along the cause-effect chain $E$.
+	To achieve complex functionalities, usually several tasks have to cooperate. 
+	A sequence of cooperating tasks is called a cause-effect chain $E=(\tau_1 \to \dots \to \tau_n)$ with $n\in \Nbb_{\geq 1}$.
+	Specifically, data that is written by $\tau_i$ is read by $\tau_{i+1}$, for $i=1, \dots, n-1$.
+	The underlying functionality is achieved when data has been propagated through all $n$ tasks. 
+	\mario{I think we need a simple application-oriented example here}
 
 	In the literature, two metrics for the end-to-end latency are usually considered:
 	\begin{enumerate}
