@@ -169,79 +169,59 @@
 \section{System Model}
 \label{sec:system_model}
 
-	In embedded systems, several tasks are deployed that each fulfills a different dedicated purpose (Lidar, Location, EKF, Camera, etc. in Figure~\ref{fig:example}).
+	In embedded systems, several tasks are deployed that each fulfills a different dedicated purpose.
 	The set of all tasks is denoted as $\Tbb$.
 	%
 	To allow the embedded system to fulfill complex assignments, tasks have to interact with each other. 
 	That is achieved by data exchange between tasks. 
-	More specifically, data is written to and read from shared resources. 
-	In the case of the running example in Figure~\ref{fig:example}, the Lidar sensor writes its data to a shared register, where the data can be picked up by the Localization and the Planner algorithm.
-	This communication behavior spans a graph of data dependencies visualized in Figure~\ref{fig:example}.
-	Each path in this graph of data dependencies describes one cause-effect chain to be analyzed. 
 
+	\smallskip
 	\textbf{Task Model:}
-	Each task $\tau\in \Tbb$ can be described by a tuple $\tau=(C_\tau, T_\tau, \phi_\tau) \in \Rbb^3$.
+	Each task $\tau\in \Tbb$ can be described by a tuple $(C_\tau, T_\tau, \phi_\tau) \in \Rbb^3$.
 	More specifically, $C_\tau >0$ is the worst-case execution time (WCET) of $\tau$, $T_\tau > 0$ is the task period, and $\phi_\tau$ is the task phase.
 	The task recurrently releases jobs, denoted by $\tau(m),~m\in \Nbb {=} \setof{0,1,2,\dots}$ according to its description.
-	That is, $\tau(0)$ is released at time $\phi_\tau$, and subsequent jobs are released every $T_{\tau}$ time units, i.e., $\tau(m)$ is released at time $\phi_\tau + m T_{\tau}$. 
+	That is, $\tau(0)$ is released at time $\phi_\tau$, and subsequent jobs are released every $T_{\tau}$ time units, i.e., $\tau(m)$ is released at time $\phi_\tau + m \cdot T_{\tau}$. 
 	Each job $\tau(m)$ executes for at most $C_\tau$ time units.
 	We consider implicit-deadline tasks where the deadline of each job is at the release of the subsequent job, i.e., the deadline of $\tau(m)$ is at $\phi_\tau + (m+1) T_{\tau}$.
 
-	This work especially emphasizes the usage of \emph{harmonic} task systems, where all task periods are integer multiples of one another.
-	That is, for any two tasks $\tau, \tau'$, we have $\frac{T_{\tau}}{T_{\tau'}} \in \Nbb$ or $\frac{T_{\tau'}}{T_{\tau}} \in \Nbb$.
+	Task systems are \emph{harmonic} if all task periods are integer multiples of one another.
+	That is, for any two tasks $\tau, \tau' \in \Tbb$, we have $\frac{T_{\tau}}{T_{\tau'}} \in \Nbb$ or $\frac{T_{\tau'}}{T_{\tau}} \in \Nbb$.
 	Harmonic task systems have the benefit that their release pattern is highly repetitive. As a result, the data propagation through these tasks is easier to analyze and to control.
-	For the majority of analytical results, a weaker form of harmonic is already sufficient to obtain the results.
-	That is, for any task $\tau \in \Tbb$, we have $\frac{\max_{\tau'\in \Tbb} T_{\tau'}}{T_{\tau}} \in \Nbb$.
-	In this case we say that $\Tbb$ is \emph{semi-harmonic}.
+	For the results of this work, weaker forms of harmonic are already sufficient.
+	Specifically, in Section~\ref{sec:harmonic}, we consider \emph{max-harmonic} tasks, where 
+	\begin{equation}
+		\frac{T_{\mathit{max}}}{T_{\tau}} \in \Nbb
+	\end{equation}
+	for all $\tau \in \Tbb$, with $T_{\mathit{max}} := \max_{\tau\in \Tbb} T_{\tau}$. 
+	For the results in Section~\ref{sec:automotive}, we consider semi-harmonic task sets with 
+	\begin{equation}
+		T_\tau \in \setof{1,2,5,10,20,50,100,200,1000}
+	\end{equation}
+	for all $\tau \in \Tbb$.
+	These semi-harmonic task sets are common in the automotive domain~\cite{kramer2015real}.
 
-	\textbf{Scheduling Model:}
-	The jobs are scheduled utilizing a preemptive Rate-Monotonic (RM) scheduling. 
-	That is, the priority of each task is given by the task period (the lower the period, the higher the priority) and at each point in time the highest priority pending task is executed. 
-	For general (not harmonic) task sets, the utilization bound is $\ln(2)$~\cite{liu73scheduling}, i.e., if the total utilization $U=\sum_{\tau\in \Tbb} \frac{C_\tau}{T_\tau}$ is at most $\ln(2)$ then all jobs meet their deadline under RM scheduling.
-	In the case that the task set is harmonic, the utilization bound is $1$~\cite{Liu:2000:RS:518501}.
-
-	For the simplicity of presentation, this work focuses on uniprocessor systems, i.e., all tasks are scheduled on a single processsor.
-	However, the results can easily be extended to any other scheduling mechanism and to synchronized multiprocessor systems by choosing the respective utilization bound from the literature~\cite{liu73scheduling,DBLP:journals/rts/LopezDG04,DBLP:conf/ecrts/AnderssonJ03,DBLP:conf/opodis/Andersson08,DBLP:conf/rtss/AnderssonBJ01,DBLP:journals/rts/OhB98,DBLP:conf/ecrts/LakshmananRL09,DBLP:conf/rtns/BruggenUCF17,DBLP:conf/rtas/GuanSYY10,DBLP:conf/sies/AnderssonT09}.
-	As an example, if tasks are scheduled using partitioned RM scheduling, then the system is schedulable if the respective utilization bound on each processor $P$ is not exceeded, i.e.,
-	\begin{math}
-		% \max_{P \text{ processor}} 
-		\sum_{\tau \text{ on } P} \frac{C_\tau}{T_\tau} < 1 
-	\end{math}
-	for harmonic tasks and 
-	\begin{math}
-		% \max_{P \text{ processor}} 
-		\sum_{\tau \text{ on } P} \frac{C_\tau}{T_\tau} < \ln(2)
-	\end{math}
-	for the general case.
-
-	\textbf{Data Dependency Graph:}
-	Usually, functionalities are performed by several tasks.
-	To achieve this, data has to be transmitted between tasks and the execution behavior of one task depends on the data obtained by the previous tasks. 
-	This data dependency can be formalized using a directed acyclic graph (DAG).
-	More specifically, each task forms one node of the DAG, and each data dependency corresponds to one edge in the DAG.
-	Figure~\ref{fig:example} demonstrates the DAG structure of the data dependencies.
-	Usually, there are timing constraints on different paths of the DAG.
-	% \mario{Note that data dependency are not precedence constraints, i.e., task release jobs according to their period.}
-
+	\smallskip
 	\textbf{Task communication:}
-	To transmit data between tasks according to the dependency graph, tasks have to communicate. 
+	To transmit data between tasks, they need to communicate. 
 	We assume that the communication can be modeled via shared resources. 
 	That is, a task writes data to a shared resource (overwriting previous data), and the successor tasks reads the data from that shared resource. 
 	In this work, we focus on the communication model of the Logical Execution Time (LET)~\cite{DBLP:conf/birthday/KirschS12} mechanism, where each job reads data at its release and writes data at its deadline.
 	More specifically, the read-event of $\tau(m)$ is at time 
-	\begin{math}
+	\begin{equation}
 		\re (\tau(m)) := \phi_{\tau} + m \cdot T_{\tau},
-	\end{math}
+	\end{equation}
 	and the write-event of $\tau(m)$ is at time 
-	\begin{math}
+	\begin{equation}
 		\we (\tau(m)) := \phi_{\tau} + (m+1) \cdot T_{\tau}.
-	\end{math}
-
-	{We assume that the communication overheads are negligible, which can be realized by existing LET implementations~\cite{Biondi2018LET, Bellassai2023JSA7}.}
-	Furthermore, we assume that each task $\tau \in \Tbb$ is part of a cause-effect chain. 
-	However, this assumption is only for the sake of readability. 
-	When a task is not part of a cause-effect chain, i.e., no timing requirement for that task is specified, its period and phase can either be fixed by the designer, or we minimize the utilization with $T_\tau \to \infty$.
-
+	\end{equation}
+	We assume that communication overheads are negligible, which is realized by existing LET implementations~\cite{Biondi2018LET, Bellassai2023JSA7}.
+	
+	\smallskip
+	\textbf{Scheduling Model:}
+	The results of this work are versatile in the sense that we do not rely on a specific scheduling model.
+	For example, typical Fixed-Priority (FP) schedulers like Rate-Monotonic (RM) and Deadline-Monotonic (DM), or Dynamic-Priority (DP) schedulers like Earliest-Deadline-First (EDF) can be applied. 
+	To ensure that task communication via LET can be realized, schedulability of the task system needs to be verified. 
+	This can be done using appropriate schedulability tests for the underlying scheduling model.
 
 
 \section{Cause-Effect Chains and End-to-End latencies}
@@ -668,7 +648,8 @@
 
 	What is the best phasing? Nobody has looked into that yet. 
 
-\section{Optimal Task Phasing for Harmonic Systems}
+\section{Optimal Task Phasing for Harmonic Systems and Max-Harmonic Systems}
+\label{sec:harmonic}
 
 
 	Indeed, the results of this section work even for a larger class of task systems. 
@@ -1079,6 +1060,7 @@
 
 
 \section{Optimal Task Phasing for Semi-Harmonic Automotive Systems}
+\label{sec:automotive}
 
 	Look at task set with automotive periods 1,2,5,10,20,50,100,200,1000
 
@@ -1124,6 +1106,11 @@
 %\vspace{-0.05in}
 \section{Conclusion}
 \label{sec:conclusion}
+
+
+Valuable extensions in future work to 
+- constrained deadline task sets
+- different communication policies like flexible LET, implicit communication
 	
 
 
