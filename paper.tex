@@ -123,6 +123,8 @@
 	\author{RTAS 2025 Submission \# \textcolor{red}{TBD} \quad\quad\quad Pages: \pageref{last-page}}
 	
 	\maketitle
+	\thispagestyle{plain}
+	\pagestyle{plain}
 
 	\begin{abstract}
 		% - introductory sentence to the topic (optional)
@@ -925,6 +927,7 @@
 		\end{equation}
 		for all $i=p, p+1, \dots, n$.
 
+		\smallskip
 		\textbf{Base case} ($i=p$):
 		By definition, $j'_i = 1 = \frac{T_{\tau_p}}{T_{\tau_i}}$.
 		Hence, Equation~\eqref{eq:induction_thm} holds for $i=p$.
@@ -953,6 +956,7 @@
 		Please note that $\frac{T_{\tau_p}}{T_{\tau_{i+1}}} \in \Nbb$ since the task periods are semi-harmonic. 
 		\qed~Equation~\eqref{eq:induction_thm}
 
+		\smallskip
 		We conclude that 
 		\begin{math}
 			\ell(\pc^p_0) 
