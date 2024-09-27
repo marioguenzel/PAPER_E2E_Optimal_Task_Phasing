@@ -35,6 +35,7 @@
 %% THEOREMS:
 % Theorems --
 \usepackage{amsthm}
+\usepackage{thmtools,thm-restate}
 
 \newtheorem{theorem}{Theorem}%[section]
 % \newtheorem{prop}[thm]{Proposition}
@@ -45,6 +46,8 @@
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 % \newtheorem{notn}[thm]{Notation}
+
+% \declaretheorem[sibling=lemma,name=Lemma]{repeatablelemma}
 
 % \theoremstyle{remark}
 % \newtheorem{rmk}[thm]{Remark}
@@ -236,10 +239,21 @@
 \label{sec:e2e}
 
 	To achieve complex functionalities, usually several tasks have to cooperate. 
-	A sequence of cooperating tasks is called a cause-effect chain $E=(\tau_1 \to \dots \to \tau_n)$ with $n\in \Nbb_{\geq 1}$.
+	A sequence of cooperating tasks is called a cause-effect chain 
+	\begin{equation}
+		E=(\tau_1 \to \dots \to \tau_n)
+	\end{equation}
+	with $n\in \Nbb_{\geq 1}$.
 	Specifically, data that is written by $\tau_i$ is read by $\tau_{i+1}$, for $i=1, \dots, n-1$.
 	The underlying functionality is achieved when data has been propagated through all $n$ tasks. 
-	\mario{I think we need a simple application-oriented example here}
+	For this work, we denote by 
+	\begin{equation}
+		\Tbb_E := \setof{\tau_1, \dots, \tau_n} \subseteq \Tbb
+	\end{equation}
+	the tasks of $\Tbb$ that are part of the cause-effect chain.
+	Furthermore, we assume that $\tau_i \neq \tau_j$ for all $i \neq j$.
+
+	\mario{I think we need a simple application-oriented example with a picture here.}
 
 	In the literature, two metrics for the end-to-end latency are usually considered:
 	\begin{enumerate}
@@ -430,6 +444,28 @@
 	\end{definition}
 
 	It is shown in~\cite{DBLP:conf/ecrts/GunzelTCBC23} that the end-to-end latency is independent of the choice of $p$, i.e., any $p \in \setof{1,\dots, n}$ can be chosen.
+
+	Furthermore, for periodic tasks under LET, the read- and write-events repeat every hyperperiod $\lcm(T_{\tau_1}, \dots, T_{\tau_n})$ of $\Tbb_E$.
+	Therefore, the partitioned job chains repeat every hyperperiod and only finitely many partitioned job chains need to be considered for the computation of the end-to-end latency. 
+	
+	\begin{restatable}{lemma}{lemmarepetetive}\label{lem:repetitive}
+		Let $\mu(p) := \frac{H}{T_{\tau_p}}$ be the number of periods of $\tau_p$ that fit into one hyperperiod $H:= \lcm(T_{\tau_1}, \dots, T_{\tau_n})$ of $\Tbb_E$.
+		We have
+		\begin{equation}
+			\ell(\pc^p_{m}) 
+			= \ell\left(\pc^p_{m+\mu(p)}\right)
+		\end{equation}
+		for all $m \geq W_p$.
+		In particular,  
+		\begin{equation}
+			\lat(E) = \max\left( \ell\left(\pc^p_{W_p}\right), \dots, \ell\left(\pc^p_{W_p+\mu(p)-1}\right) \right)
+		\end{equation}
+		holds.
+	\end{restatable}
+
+	While it is easy to convince ourselves that this lemma holds, the proof requires technical details and is moved to the \hyperref[sec:appendix]{Appendix} for readability. 
+
+
 
 
 
@@ -701,129 +737,13 @@
 		Let $\tau_p$ be the task with the highest period of $E$, i.e., $T_{\tau_p} = \max_{i=1, \dots, n} T_{\tau_i}$.
 		If $\Tbb_E$ is max-harmonic, then 
 		\begin{equation}
-			\ell(\pc^p_{W_p}) 
-			= \ell(\pc^p_{W_p+1}) 
-			= \ell(\pc^p_{W_p+2})
-			= \dots 
-		\end{equation}
-		In particular,  
-		\begin{math}
 			\lat(E) = \ell(\pc^p_{W_p}) 
-		\end{math}
+		\end{equation}
 		holds.
 	\end{lemma}
 
 	\begin{proof}
-		Let $m\geq W_p$.
-		In the following we show that $\ell(\pc^p_{m}) 
-		= \ell(\pc^p_{m+1})$.
-	%
-		By definition, $\pc^p_m = (\bc_m, \fc_{m+1})$ and $\pc^p_{m+1} = (\bc_{m+1}, \fc_{m+2})$.
-		We start by investigating the immediate backward job chains, denoted as 
-		$\bc_m = (\tau_1(j_1) \to\dots\to \tau_p(j_p))$ and $\bc_{m+1} = (\tau_1(\tilde{j}_1) \to\dots\to \tau_p({\tilde{j}}_p))$.
-		By induction, we show that the jobs of both immediate backward job chains are exactly $T_{\tau_p}$ time units apart, or equivalently
-		\begin{equation}\label{eq:induction1}
-			j_i + \frac{T_{\tau_p}}{T_{\tau_i}} = \tilde{j}_i
-		\end{equation}
-		for all $i=p, p{-}1, \dots, 1$.
-
-		\textbf{Base case} ($i=p$):
-		By definition of the immediate backward job chains, $j_i = m $ and $\tilde{j}_i = m+1$.
-		Hence, $j_i + \frac{T_{\tau_p}}{T_{\tau_i}} = m + \frac{T_{\tau_p}}{T_{\tau_p}} = m+1 = \tilde{j}_i$.
-
-		\textbf{Induction step} ($i \mapsto i-1$):
-		By definition of immediate backward job chains, 
-		$j_{i-1} = \max \set{\xi \in \Nbb}{ \phi_{\tau_{i-1}} + (\xi+1) \cdot T_{\tau_{i-1}} \leq \phi_{\tau_i} + j_i \cdot T_{\tau_{i}}}$.
-		Therefore, $j_{i-1}$ can be formulated as 
-		$j_{i-1} = \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1$.
-		Similarly, $\tilde{j}_{i-1}$ can be written as 
-		$\tilde{j}_{i-1} = \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + \tilde{j}_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1$.
-		We know by the induction hypothesis, that $\tilde{j}_i = j_i + \frac{T_{\tau_p}}{T_{\tau_i}}$.
-		Therefore, 
-		\begin{math}
-			\tilde{j}_{i-1} 
-			= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i-1}}}} -1
-			= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}} + \frac{T_{\tau_p}}{T_{\tau_i}}} -1
-			\overset{\text{(a)}}{=} \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1 + \frac{T_{\tau_p}}{T_{\tau_i}}
-			= j_{i-1} + \frac{T_{\tau_p}}{T_{\tau_i}}
-		\end{math}
-		% \begin{align}
-		% 	\tilde{j}_{i-1} 
-		% 	&= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i-1}}}} -1
-		% 	= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}} + \frac{T_{\tau_p}}{T_{\tau_i}}} -1
-		% 	\\& \overset{\text{(a)}}{=} \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1 + \frac{T_{\tau_p}}{T_{\tau_i}}
-		% 	= j_{i-1} + \frac{T_{\tau_p}}{T_{\tau_i}}
-		% \end{align}
-		where (a) holds because $\frac{T_{\tau_p}}{T_{\tau_i}} \in \Nbb$ by the max-harmonic property. \qed~Equation~\eqref{eq:induction1}
-
-		In the following we investigate the immediate forward chains, which we denote by
-		$\fc_{m+1} = (\tau_p(j'_p) \to\dots\to \tau_n(j'_n))$ and $\fc_{m+2} = (\tau_p(\tilde{j}'_p) \to\dots\to \tau_n({\tilde{j}'}_n))$.
-		We show that the jobs of both immediate forward job chains are also exactly $T_{\tau_p}$ time units apart.
-		More specifically, we show by induction that 
-		\begin{equation}\label{eq:induction2}
-			j'_i + \frac{T_{\tau_p}}{T_{\tau_i}} = \tilde{j}'_i
-		\end{equation}
-		for all $i=p, p{+}1, \dots, n$.
-		To achieve this, we additionally show that $j'_i, \tilde{j}'_i > W_i$ during the induction.
-
-		\textbf{Base case} ($i=p$):
-		By definition of the immediate forward job chains, $j'_i = m+1 $ and $\tilde{j}'_i = m+2$.
-		Hence, $j'_i + \frac{T_{\tau_p}}{T_{\tau_i}} = m +1 + \frac{T_{\tau_p}}{T_{\tau_p}} = m+2 = \tilde{j}'_i$.
-		Since $m \geq W_p$ by assumption, we obtain $j'_i = m+1 > W_i$ and $\tilde{j}'_i = m+2 > W_i$.
-
-		\textbf{Induction step} ($i \mapsto i+1$):
-		By definition of immediate forward job chains, 
-		$j'_{i+1} = \min \set{\xi \in \Nbb}{\phi_{\tau_i} + (j'_i +1) \cdot T_{\tau_i} \leq \phi_{\tau_{i+1}} + \xi \cdot T_{\tau_{i+1}}}$.
-		Therefore, $j'_{i+1}$ can be formulated as 
-		$j'_{i+1} = \max\setof{\ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} , 0}$.
-		
-		We start by showing that $j'_{i+1}>W_{i+1}$ by contradiction.
-		To that end, assume $j'_{i+1} \leq W_{i+1}$.
-		Then, $\re(\tau_{i+1}(j'_{i+1})) \leq \re(\tau_{i+1}(W_{i+1}))$ as well.
-		Since $\tau_i(j'_i)$ and $\tau_{i+1}(j'_{i+1})$ are two subsequent jobs in $\fc_{m+1}$, we have $\we(\tau_i(j'_i)) \leq \re(\tau_{i+1}(j'_{i+1}))$.
-		Hence, $\we(\tau_i(j'_i)) \leq \re(\tau_{i+1}(W_{i+1}))$ holds.
-		Since $W_i$ is the highest integer with $\we(\tau_i(W_i)) \leq \re(\tau_{i+1}(W_{i+1}))$, we obtain $W_i \geq j'_i$ which contradicts the induction hypothesis.
-
-		Since we have shown that $j'_{i+1} > W_{i+1} \geq 0$, we know that $j'_{i+1}>0$.
-		Hence, the maximum in $j'_{i+1} = \max\setof{\ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} , 0}$ always returns the first value. 
-		That means that $j'_{i+1}$ can be formulated as
-		\begin{math}
-			j'_{i+1} = \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}}.
-		\end{math}
-		Similarly, we show that $\tilde{j}'_{i+1} > W_{i+1}$ and that 
-		\begin{math}
-			\tilde{j}'_{i+1} = \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (\tilde{j}'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}}.
-		\end{math}
-		%
-		We utilize the induction hypothesis $\tilde{j}'_i = j'_i + \frac{T_{\tau_p}}{T_{\tau_i}}$ to obtain
-		\begin{math}
-			\tilde{j}'_{i+1} 
-			= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i+1}}}}
-			= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}}
-			= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
-			= j'_{i+1} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
-		\end{math}
-		% \begin{align}
-		% 	\tilde{j}'_{i+1} 
-		% 	&= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i+1}}}}
-		% 	= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}}
-		% 	\\&
-		% 	= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
-		% 	= j'_{i+1} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
-		% \end{align}
-		where $\frac{T_{\tau_p}}{T_{\tau_{i+1}}} \in \Nbb$ because the periods are max-harmonic.
-		\qed~Equation~\eqref{eq:induction2}
-
-		We conclude that $j_1 + \frac{T_{\tau_p}}{T_{\tau_1}} = \tilde{j}_1$ by Equation~\eqref{eq:induction1} and $j'_n + \frac{T_{\tau_p}}{T_{\tau_n}} = \tilde{j}'_n$ by Equation~\eqref{eq:induction2}.
-		Therefore, $\re(\tau_1(j_1)) + T_{\tau_p} = \re(\tau_1(\tilde{j}_1))$ and $\we(\tau_n(j'_n)) + T_{\tau_p} = \we(\tau_n(\tilde{j}'_n))$.
-		Hence, we obtain%
-		\begin{math}
-			\ell(\pc^p_m) = \we(\tau_n(j'_n)) - \re(\tau_1(j_1)) 
-			% = \we(\tau_n(j'_n)) + T_{\tau_p}  - \left(\re(\tau_1(j_1)) + T_{\tau_p} \right) 
-			= \we(\tau_n(\tilde{j}'_n)) - \re(\tau_1(\tilde{j}_1)) 
-			= \ell(\pc^p_{m+1})
-		\end{math}
-		as desired.
+		\mario{use Lemma~\ref{lem:repetitive}}
 	\end{proof}
 
 	The previous lemma indicates that, to minimize the end-to-end latency, it is sufficient to choose phases which minimize the \emph{first} partitioned job chain.
@@ -1171,7 +1091,129 @@
 Valuable extensions in future work to 
 - constrained deadline task sets
 - different communication policies like flexible LET, implicit communication
+
+
+\appendix
+\label{sec:appendix}
+
+We prove Lemma~\ref{lem:repetitive} from page \pageref{lem:repetitive}:
+
+\lemmarepetetive*
+
+\begin{proof}
+	\mario{Proof to be adjusted to account for hyperperiod}
+
+	Let $m\geq W_p$.
+	In the following we show that $\ell(\pc^p_{m}) 
+	= \ell(\pc^p_{m+1})$.
+%
+	By definition, $\pc^p_m = (\bc_m, \fc_{m+1})$ and $\pc^p_{m+1} = (\bc_{m+1}, \fc_{m+2})$.
+	We start by investigating the immediate backward job chains, denoted as 
+	$\bc_m = (\tau_1(j_1) \to\dots\to \tau_p(j_p))$ and $\bc_{m+1} = (\tau_1(\tilde{j}_1) \to\dots\to \tau_p({\tilde{j}}_p))$.
+	By induction, we show that the jobs of both immediate backward job chains are exactly $T_{\tau_p}$ time units apart, or equivalently
+	\begin{equation}\label{eq:induction1}
+		j_i + \frac{T_{\tau_p}}{T_{\tau_i}} = \tilde{j}_i
+	\end{equation}
+	for all $i=p, p{-}1, \dots, 1$.
+
+	\textbf{Base case} ($i=p$):
+	By definition of the immediate backward job chains, $j_i = m $ and $\tilde{j}_i = m+1$.
+	Hence, $j_i + \frac{T_{\tau_p}}{T_{\tau_i}} = m + \frac{T_{\tau_p}}{T_{\tau_p}} = m+1 = \tilde{j}_i$.
+
+	\textbf{Induction step} ($i \mapsto i-1$):
+	By definition of immediate backward job chains, 
+	$j_{i-1} = \max \set{\xi \in \Nbb}{ \phi_{\tau_{i-1}} + (\xi+1) \cdot T_{\tau_{i-1}} \leq \phi_{\tau_i} + j_i \cdot T_{\tau_{i}}}$.
+	Therefore, $j_{i-1}$ can be formulated as 
+	$j_{i-1} = \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1$.
+	Similarly, $\tilde{j}_{i-1}$ can be written as 
+	$\tilde{j}_{i-1} = \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + \tilde{j}_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1$.
+	We know by the induction hypothesis, that $\tilde{j}_i = j_i + \frac{T_{\tau_p}}{T_{\tau_i}}$.
+	Therefore, 
+	\begin{math}
+		\tilde{j}_{i-1} 
+		= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i-1}}}} -1
+		= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}} + \frac{T_{\tau_p}}{T_{\tau_i}}} -1
+		\overset{\text{(a)}}{=} \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1 + \frac{T_{\tau_p}}{T_{\tau_i}}
+		= j_{i-1} + \frac{T_{\tau_p}}{T_{\tau_i}}
+	\end{math}
+	% \begin{align}
+	% 	\tilde{j}_{i-1} 
+	% 	&= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i-1}}}} -1
+	% 	= \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}} + \frac{T_{\tau_p}}{T_{\tau_i}}} -1
+	% 	\\& \overset{\text{(a)}}{=} \floor{\frac{\phi_{\tau_i} - \phi_{\tau_{i-1}} + j_i \cdot T_{\tau_i}}{T_{\tau_{i-1}}}} -1 + \frac{T_{\tau_p}}{T_{\tau_i}}
+	% 	= j_{i-1} + \frac{T_{\tau_p}}{T_{\tau_i}}
+	% \end{align}
+	where (a) holds because $\frac{T_{\tau_p}}{T_{\tau_i}} \in \Nbb$ by the max-harmonic property. \qed~Equation~\eqref{eq:induction1}
+
+	In the following we investigate the immediate forward chains, which we denote by
+	$\fc_{m+1} = (\tau_p(j'_p) \to\dots\to \tau_n(j'_n))$ and $\fc_{m+2} = (\tau_p(\tilde{j}'_p) \to\dots\to \tau_n({\tilde{j}'}_n))$.
+	We show that the jobs of both immediate forward job chains are also exactly $T_{\tau_p}$ time units apart.
+	More specifically, we show by induction that 
+	\begin{equation}\label{eq:induction2}
+		j'_i + \frac{T_{\tau_p}}{T_{\tau_i}} = \tilde{j}'_i
+	\end{equation}
+	for all $i=p, p{+}1, \dots, n$.
+	To achieve this, we additionally show that $j'_i, \tilde{j}'_i > W_i$ during the induction.
+
+	\textbf{Base case} ($i=p$):
+	By definition of the immediate forward job chains, $j'_i = m+1 $ and $\tilde{j}'_i = m+2$.
+	Hence, $j'_i + \frac{T_{\tau_p}}{T_{\tau_i}} = m +1 + \frac{T_{\tau_p}}{T_{\tau_p}} = m+2 = \tilde{j}'_i$.
+	Since $m \geq W_p$ by assumption, we obtain $j'_i = m+1 > W_i$ and $\tilde{j}'_i = m+2 > W_i$.
+
+	\textbf{Induction step} ($i \mapsto i+1$):
+	By definition of immediate forward job chains, 
+	$j'_{i+1} = \min \set{\xi \in \Nbb}{\phi_{\tau_i} + (j'_i +1) \cdot T_{\tau_i} \leq \phi_{\tau_{i+1}} + \xi \cdot T_{\tau_{i+1}}}$.
+	Therefore, $j'_{i+1}$ can be formulated as 
+	$j'_{i+1} = \max\setof{\ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} , 0}$.
 	
+	We start by showing that $j'_{i+1}>W_{i+1}$ by contradiction.
+	To that end, assume $j'_{i+1} \leq W_{i+1}$.
+	Then, $\re(\tau_{i+1}(j'_{i+1})) \leq \re(\tau_{i+1}(W_{i+1}))$ as well.
+	Since $\tau_i(j'_i)$ and $\tau_{i+1}(j'_{i+1})$ are two subsequent jobs in $\fc_{m+1}$, we have $\we(\tau_i(j'_i)) \leq \re(\tau_{i+1}(j'_{i+1}))$.
+	Hence, $\we(\tau_i(j'_i)) \leq \re(\tau_{i+1}(W_{i+1}))$ holds.
+	Since $W_i$ is the highest integer with $\we(\tau_i(W_i)) \leq \re(\tau_{i+1}(W_{i+1}))$, we obtain $W_i \geq j'_i$ which contradicts the induction hypothesis.
+
+	Since we have shown that $j'_{i+1} > W_{i+1} \geq 0$, we know that $j'_{i+1}>0$.
+	Hence, the maximum in $j'_{i+1} = \max\setof{\ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} , 0}$ always returns the first value. 
+	That means that $j'_{i+1}$ can be formulated as
+	\begin{math}
+		j'_{i+1} = \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}}.
+	\end{math}
+	Similarly, we show that $\tilde{j}'_{i+1} > W_{i+1}$ and that 
+	\begin{math}
+		\tilde{j}'_{i+1} = \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (\tilde{j}'_i+1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}}.
+	\end{math}
+	%
+	We utilize the induction hypothesis $\tilde{j}'_i = j'_i + \frac{T_{\tau_p}}{T_{\tau_i}}$ to obtain
+	\begin{math}
+		\tilde{j}'_{i+1} 
+		= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i+1}}}}
+		= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}}
+		= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
+		= j'_{i+1} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
+	\end{math}
+	% \begin{align}
+	% 	\tilde{j}'_{i+1} 
+	% 	&= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i} + T_{\tau_p}}{T_{\tau_{i+1}}}}
+	% 	= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}}
+	% 	\\&
+	% 	= \ceiling{\frac{\phi_{\tau_i} - \phi_{\tau_{i+1}} + (j'_i +1) \cdot T_{\tau_i}}{T_{\tau_{i+1}}}} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
+	% 	= j'_{i+1} + \frac{T_{\tau_p}}{T_{\tau_{i+1}}}
+	% \end{align}
+	where $\frac{T_{\tau_p}}{T_{\tau_{i+1}}} \in \Nbb$ because the periods are max-harmonic.
+	\qed~Equation~\eqref{eq:induction2}
+
+	We conclude that $j_1 + \frac{T_{\tau_p}}{T_{\tau_1}} = \tilde{j}_1$ by Equation~\eqref{eq:induction1} and $j'_n + \frac{T_{\tau_p}}{T_{\tau_n}} = \tilde{j}'_n$ by Equation~\eqref{eq:induction2}.
+	Therefore, $\re(\tau_1(j_1)) + T_{\tau_p} = \re(\tau_1(\tilde{j}_1))$ and $\we(\tau_n(j'_n)) + T_{\tau_p} = \we(\tau_n(\tilde{j}'_n))$.
+	Hence, we obtain%
+	\begin{math}
+		\ell(\pc^p_m) = \we(\tau_n(j'_n)) - \re(\tau_1(j_1)) 
+		% = \we(\tau_n(j'_n)) + T_{\tau_p}  - \left(\re(\tau_1(j_1)) + T_{\tau_p} \right) 
+		= \we(\tau_n(\tilde{j}'_n)) - \re(\tau_1(\tilde{j}_1)) 
+		= \ell(\pc^p_{m+1})
+	\end{math}
+	as desired.
+\end{proof}
 
 
 % bib
