@@ -85,6 +85,7 @@
 \else
 	\usepackage[caption=false,font=footnotesize]{subfig}
 \fi
+\usepackage{enumitem}
 
 \newcommand{\mrt}{\mathrm{MRT}}
 \newcommand{\lat}{\mathrm{Lat}}
@@ -92,6 +93,9 @@
 \newcommand{\fc}{\fw{c}}
 \newcommand{\bc}{\bw{c}}
 \newcommand{\pc}{{pc}}
+
+\newcommand{\Tmaxone}{T^E_{\mathit{max},1}}
+\newcommand{\Tmaxtwo}{T^E_{\mathit{max},2}}
 
 
 
@@ -1029,7 +1033,7 @@
 
 	Since the lower bound coincides with the end-to-end latency for max-harmonic systems with our suggested phasing, our phasing is optimal.
 
-	\begin{theorem}[Optimality]
+	\begin{theorem}[Optimality]\label{thm:optimal_max_harmonic}
 		If $\Tbb_E$ is max-harmonic, then the task phasing presented in Equation~\eqref{eq:phasing} minimizes the end-to-end latency.
 		In particular, the suggested phasing minimizes the end-to-end latency in harmonic systems.
 	\end{theorem}
@@ -1046,7 +1050,50 @@
 \section{Optimal Task Phasing for Semi-Harmonic Automotive Systems}
 \label{sec:automotive}
 
-	Look at task set with automotive periods 1,2,5,10,20,50,100,200,1000
+	In industrial applications, systems are not always fully harmonic. 
+	Rather, systems are \emph{almost} harmonic (also called semi-harmonic).
+	Especially in the automotive domain, it is common that task periods are chosen such that 
+	\begin{equation}
+		T_\tau \in T^{\mathit{Aut}} := \setof{1,2,5,10,20,50,100,200,1000} 
+	\end{equation} 
+	for all $\tau \in \Tbb$,
+	as specified by real-world automotive benchmarks~\cite{kramer2015real}.
+	In this section, we discuss how our findings from Section~\ref{sec:harmonic} can be extended to such semi-harmonic automotive systems.
+	That is, we consider the cause-effect chain $E = (\tau_1 \to\dots\to \tau_n)$ with $T_{\tau_i} \in T^{\mathit{Aut}}$ for all $i=1, \dots, n$.
+	For notational convenience, we denote by 
+	\begin{equation}
+		\Tmaxone := \max \set{T_{\tau_i}}{\tau_i\in \Tbb_E}
+	\end{equation}
+	the maximal period of tasks of $E$, and by 
+	\begin{equation}
+		\Tmaxtwo := \max \set{T_{\tau_i}}{\tau_i\in \Tbb_E, T_{\tau_i} \neq \Tmaxone}
+	\end{equation}
+	the second highest period if there is any.
+	Otherwise, we let $\Tmaxtwo := 0$ if there are only tasks with one period in $\Tbb_E$.
+
+	First, for cases in which $\Tbb_E$ is max-harmonic we can directly apply the results from Section~\ref{sec:harmonic}.
+
+	\begin{theorem}[Max-Harmonic Automotive]
+		If any of the following three cases holds, then the taskset $\Tbb_E$ is max-harmonic and our results from the previous section are applicable:
+		\begin{enumerate}[label=(\roman*)]
+			\item $\Tmaxone \notin \setof{5,50}$
+			\item $\Tmaxone = 5$ and $\Tmaxtwo \neq 2$
+			\item $\Tmaxone = 50$ and $\Tmaxtwo \neq 20$
+		\end{enumerate}
+		In particular, the phasing from Definition~\ref{def:phasing_max_harm} is optimal due to Theorem~\ref{thm:optimal_max_harmonic}, and the end-to-end latency under the phasing from Definition~\ref{def:phasing_max_harm} is given by Theorem~\ref{thm:e2e_with_phasing_harm}.
+	\end{theorem}
+
+	\begin{proof}
+		Under any of the cases (i), (ii) and (iii), we have
+		$\frac{\Tmaxone}{T_{\tau_i}} \in \Nbb$ for all $\tau_i \in \Tbb_E$.
+		Therefore, $\Tbb_E$ is max-harmonic, and Theorems~\ref{thm:optimal_max_harmonic} and~\ref{thm:e2e_with_phasing_harm} can be applied.
+	\end{proof}
+
+
+	
+
+
+
 
 
 	Thm: If all periods divide the largest period, the strategy from previous section still optimal phasing.
