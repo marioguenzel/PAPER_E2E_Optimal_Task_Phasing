@@ -1126,6 +1126,13 @@
 				% no labellin22				
 				% \releases{0,5,10}
 				% \deadlines{5,10}
+
+
+				\fill[color=red] (0,0) rectangle (5,1); 
+				\fill[color=red] (5,0) -- (5,1) -- (10,0); 
+
+				\fill[color=blue] (10,1) -- (5,1) -- (10,0); 
+				\fill[color=blue] (10,0) rectangle (15,1);
 				
 				% \exec[fill=black!30]{0}{2}
 				% \exec{2}{4}
@@ -1138,7 +1145,7 @@
 				% no suspension
 			\end{scope}
 			
-			\begin{scope}[shift={(0,4.5)}] % task two
+			\begin{scope}[shift={(0,4)}] % task two
 				\taskname{$\tau_2$}
 				
 				\timeline{0}{23}{}
@@ -1146,6 +1153,10 @@
 				
 				% \releases{0}
 				% \deadlines{12}
+
+				\fill[color=red] (10,0) rectangle (11,1); 
+
+				\fill[color=blue] (15,0) rectangle (16,1); 
 				
 				\exec{5}{6}
 				\exec{6}{7}
@@ -1169,11 +1180,15 @@
 				\execopen{22}{22.5}
 			\end{scope}
 
-			\begin{scope}[shift={(0,3)}] % task three
+			\begin{scope}[shift={(0,2)}] % task three
 				\taskname{$\tau_3$}
 								
 				\timeline{0}{23}{}
 				\labelling{0}{22}{2}{0}
+
+				\fill[color=red] (11,0) rectangle (13,1); 
+
+				\fill[color=blue] (17,0) rectangle (19,1);
 
 				\exec{7}{9}
 				\exec{9}{11}
@@ -1183,6 +1198,8 @@
 				\exec{17}{19}
 				\exec{19}{21}
 				\execopen{21}{22.5}
+
+				\draw[<->] (16,1.5) -- (17,1.5);
 
 			\end{scope}
 			\end{tikzpicture}	
@@ -1197,6 +1214,12 @@
 				% no labellin22				
 				% \releases{0,5,10}
 				% \deadlines{5,10}
+
+				\fill[color=red] (0,0) rectangle (5,1); 
+				\fill[color=red] (5,0) -- (5,1) -- (10,0); 
+
+				\fill[color=blue] (10,1) -- (5,1) -- (10,0); 
+				\fill[color=blue] (10,0) rectangle (15,1);
 				
 				% \exec[fill=black!30]{0}{2}
 				% \exec{2}{4}
@@ -1209,7 +1232,7 @@
 				% no suspension
 			\end{scope}
 			
-			\begin{scope}[shift={(0,4.5)}] % task two
+			\begin{scope}[shift={(0,4)}] % task two
 				\taskname{$\tau_2$}
 				
 				\timeline{0}{23}{}
@@ -1217,6 +1240,10 @@
 				
 				% \releases{0}
 				% \deadlines{12}
+
+				\fill[color=red] (10,0) rectangle (11,1); 
+
+				\fill[color=blue] (15,0) rectangle (16,1); 
 				
 				\exec{5}{6}
 				\exec{6}{7}
@@ -1240,11 +1267,15 @@
 				\execopen{22}{22.5}
 			\end{scope}
 
-			\begin{scope}[shift={(0,3)}] % task three
+			\begin{scope}[shift={(0,2)}] % task three
 				\taskname{$\tau_3$}
 											
 				\timeline{0}{23}{}
 				\labelling{0}{22}{2}{0}
+
+				\fill[color=red] (12,0) rectangle (14,1); 
+
+				\fill[color=blue] (16,0) rectangle (18,1);
 
 				\exec{6}{8}
 				\exec{8}{10}
@@ -1256,10 +1287,12 @@
 				\exec{20}{22}
 				\execopen{22}{22.5}
 
+				\draw[<->] (11,1.5) -- (12,1.5);
+
 			\end{scope}
 			\end{tikzpicture}	
 		\label{fig:automotive_example:optimal_second}}
-		\caption{Example of three tasks demonstrating that not both $\ell(\pc^p_{W_p})$ and $\ell(\pc^p_{W_p+1})$ can be minimized simultaneously. The partitioned job chain $\pc^p_{W_p}$ is marked in red and $\pc^p_{W_p+1}$ is marked in blue. The jobs belonging to both are half red and half blue.}
+		\caption{Example of three tasks demonstrating that not both $\ell(\pc^p_{W_p})$ and $\ell(\pc^p_{W_p+1})$ can be minimized simultaneously. The partitioned job chain $\pc^p_{W_p}$ is marked in red and $\pc^p_{W_p+1}$ is marked in blue. The jobs belonging to both are half red and half blue. Gaps are depicted as left-right arrows.}
 		\label{fig:automotive_example}
 	\end{figure}
 
