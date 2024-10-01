@@ -753,7 +753,7 @@
 	\end{proof}
 
 	The previous lemma indicates that, to minimize the end-to-end latency, it is sufficient to choose phases which minimize the \emph{first} partitioned job chain.
-	We achieve that, by ensuring that there is no slack between read- and write-events of $\pc^p_{W_p}$.
+	We achieve that, by ensuring that there is no slack between write- and read-events of subsequent jobs of $\pc^p_{W_p}$.
 	In particular, we consider the following task phasing.
 
 	\begin{definition}[Suggested Phasing for Max-Harmonic]\label{def:phasing_max_harm}
@@ -1076,19 +1076,192 @@
 	\begin{theorem}[Max-Harmonic Automotive]
 		If any of the following three cases holds, then the taskset $\Tbb_E$ is max-harmonic and our results from the previous section are applicable:
 		\begin{enumerate}[label=(\roman*)]
-			\item $\Tmaxone \notin \setof{5,50}$
-			\item $\Tmaxone = 5$ and $\Tmaxtwo \neq 2$
-			\item $\Tmaxone = 50$ and $\Tmaxtwo \neq 20$
+			\item $\Tmaxone \notin \setof{5,50}$ \label{item:automotive_max_harm_case1}
+			\item $\Tmaxone = 5$ and $\Tmaxtwo \neq 2$ \label{item:automotive_max_harm_case2}
+			\item $\Tmaxone = 50$ and $\Tmaxtwo \neq 20$ \label{item:automotive_max_harm_case3}
 		\end{enumerate}
 		In particular, the phasing from Definition~\ref{def:phasing_max_harm} is optimal due to Theorem~\ref{thm:optimal_max_harmonic}, and the end-to-end latency under the phasing from Definition~\ref{def:phasing_max_harm} is given by Theorem~\ref{thm:e2e_with_phasing_harm}.
 	\end{theorem}
 
 	\begin{proof}
-		Under any of the cases (i), (ii) and (iii), we have
+		Under any of the cases \ref{item:automotive_max_harm_case1}--\ref{item:automotive_max_harm_case3}, we have
 		$\frac{\Tmaxone}{T_{\tau_i}} \in \Nbb$ for all $\tau_i \in \Tbb_E$.
 		Therefore, $\Tbb_E$ is max-harmonic, and Theorems~\ref{thm:optimal_max_harmonic} and~\ref{thm:e2e_with_phasing_harm} can be applied.
 	\end{proof}
 
+	In the remainder of this section, we consider the case that $\Tbb_E$ is not max-harmonic. 
+	Specifically, this is achieved in the following two cases:
+	\begin{enumerate}[label=(\roman*),start=4]
+		\item $\Tmaxone = 5$ and $\Tmaxtwo=2$ \label{item:automotive_max_harm_case4}
+		\item $\Tmaxone = 50$ and $\Tmaxtwo=20$ \label{item:automotive_max_harm_case5}
+	\end{enumerate}
+	In both cases, the hyperperiod $H = \lcm(T_{\tau_1}, \dots, T_{\tau_n})$ of tasks of $\Tbb_E$ is two times the highest period, i.e., $H = 2\cdot \Tmaxone$.
+	This observation allows us to determine the end-to-end latency by constructing only two partitioned job chains.
+
+	\begin{lemma}
+		Let $\tau_p$ be a task with the highest priority of $E$, i.e., $T_{\tau_p} = \Tmaxone$.
+		If~\ref{item:automotive_max_harm_case4} or~\ref{item:automotive_max_harm_case4} holds, then 
+		\begin{equation}
+			\lat(E) = \max( \ell(\pc^p_{W_p}) , \ell(\pc^p_{W_p+1}) )
+		\end{equation}
+		is the end-to-end latency.
+	\end{lemma}
+
+	\begin{proof}
+		Use Lemma~\ref{lem:repetitive}
+	\end{proof}
+
+	Therefore, to minimize the end-to-end latency, we need to minimize the maximal length of both $\pc^p_{W_p}$ and $\pc^p_{W_p+1}$.
+	However, Figure~\ref{fig:automotive_example} demonstrates that it is not possible to eliminate the slack between write- and read-events of subsequent jobs of both $\pc^p_{W_p}$ and $\pc^p_{W_p+1}$.
+	%
+	\begin{figure}
+		\centering
+		\subfloat[Minimize $\ell(\pc^p_{W_p})$.]{
+		\begin{tikzpicture}[yscale=0.25, xscale=0.27]
+
+			\begin{scope}[shift={(0,6)}] % task one
+				\taskname{$\tau_1$}
+				
+				\timeline{0}{23}{}
+				% no labellin22				
+				% \releases{0,5,10}
+				% \deadlines{5,10}
+				
+				% \exec[fill=black!30]{0}{2}
+				% \exec{2}{4}
+				\exec{0}{5}
+				\exec{5}{10}
+				\exec{10}{15}
+				\exec{15}{20}
+				\execopen{20}{22.5}
+				
+				% no suspension
+			\end{scope}
+			
+			\begin{scope}[shift={(0,4.5)}] % task two
+				\taskname{$\tau_2$}
+				
+				\timeline{0}{23}{}
+				% \labelling{02213}{2}{0}
+				
+				% \releases{0}
+				% \deadlines{12}
+				
+				\exec{5}{6}
+				\exec{6}{7}
+				\exec{7}{8}
+				\exec{8}{9}
+				\exec{9}{10}
+
+				\exec{10}{11}
+				\exec{11}{12}
+				\exec{12}{13}
+				\exec{13}{14}
+				\exec{14}{15}
+
+				\exec{15}{16}
+				\exec{16}{17}
+				\exec{17}{18}
+				\exec{18}{19}
+				\exec{19}{20}
+				\exec{20}{21}
+				\exec{21}{22}
+				\execopen{22}{22.5}
+			\end{scope}
+
+			\begin{scope}[shift={(0,3)}] % task three
+				\taskname{$\tau_3$}
+								
+				\timeline{0}{23}{}
+				\labelling{0}{22}{2}{0}
+
+				\exec{7}{9}
+				\exec{9}{11}
+				\exec{11}{13}
+				\exec{13}{15}
+				\exec{15}{17}
+				\exec{17}{19}
+				\exec{19}{21}
+				\execopen{21}{22.5}
+
+			\end{scope}
+			\end{tikzpicture}	
+		\label{fig:automotive_example:optimal_first}}
+		\\
+		\subfloat[Minimize $\ell(\pc^p_{W_p+1})$.]{
+			\begin{tikzpicture}[yscale=0.25, xscale=0.27]
+			\begin{scope}[shift={(0,6)}] % task one
+				\taskname{$\tau_1$}
+				
+				\timeline{0}{23}{}
+				% no labellin22				
+				% \releases{0,5,10}
+				% \deadlines{5,10}
+				
+				% \exec[fill=black!30]{0}{2}
+				% \exec{2}{4}
+				\exec{0}{5}
+				\exec{5}{10}
+				\exec{10}{15}
+				\exec{15}{20}
+				\execopen{20}{22.5}
+				
+				% no suspension
+			\end{scope}
+			
+			\begin{scope}[shift={(0,4.5)}] % task two
+				\taskname{$\tau_2$}
+				
+				\timeline{0}{23}{}
+				% \labelling{02213}{2}{0}
+				
+				% \releases{0}
+				% \deadlines{12}
+				
+				\exec{5}{6}
+				\exec{6}{7}
+				\exec{7}{8}
+				\exec{8}{9}
+				\exec{9}{10}
+
+				\exec{10}{11}
+				\exec{11}{12}
+				\exec{12}{13}
+				\exec{13}{14}
+				\exec{14}{15}
+
+				\exec{15}{16}
+				\exec{16}{17}
+				\exec{17}{18}
+				\exec{18}{19}
+				\exec{19}{20}
+				\exec{20}{21}
+				\exec{21}{22}
+				\execopen{22}{22.5}
+			\end{scope}
+
+			\begin{scope}[shift={(0,3)}] % task three
+				\taskname{$\tau_3$}
+											
+				\timeline{0}{23}{}
+				\labelling{0}{22}{2}{0}
+
+				\exec{6}{8}
+				\exec{8}{10}
+				\exec{10}{12}
+				\exec{12}{14}
+				\exec{14}{16}
+				\exec{16}{18}
+				\exec{18}{20}
+				\exec{20}{22}
+				\execopen{22}{22.5}
+
+			\end{scope}
+			\end{tikzpicture}	
+		\label{fig:automotive_example:optimal_second}}
+		\caption{Example of three tasks demonstrating that not both $\ell(\pc^p_{W_p})$ and $\ell(\pc^p_{W_p+1})$ can be minimized simultaneously. The partitioned job chain $\pc^p_{W_p}$ is marked in red and $\pc^p_{W_p+1}$ is marked in blue. The jobs belonging to both are half red and half blue.}
+		\label{fig:automotive_example}
+	\end{figure}
 
 	
 
