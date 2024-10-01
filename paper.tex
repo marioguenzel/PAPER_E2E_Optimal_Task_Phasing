@@ -1295,10 +1295,38 @@
 		\caption{Example of three tasks demonstrating that not both $\ell(\pc^p_{W_p})$ and $\ell(\pc^p_{W_p+1})$ can be minimized simultaneously. The partitioned job chain $\pc^p_{W_p}$ is marked in red and $\pc^p_{W_p+1}$ is marked in blue. The jobs belonging to both are half red and half blue. Gaps are depicted as left-right arrows.}
 		\label{fig:automotive_example}
 	\end{figure}
+	%
+	The example consists of a cause-effect chain $E = (\tau_1 \to \tau_2 \to \tau_3 )$ with three tasks.
+	The tasks have periods $T_{\tau_1} = 5$, $T_{\tau_2} = 1$ and $T_{\tau_3} = 2$.
+	Therefore, that cause-effect chains falls in case \ref{item:automotive_max_harm_case4}, and $\Tbb_E$ is not max-harmonic.
+	If we minimize $\ell(\pc^p_{W_p})$, the write-event of $\tau_2$ and the read-event of $\tau_3$ do not align for $\pc^p_{W_p+1}$, as depicted in Figure~\ref{fig:automotive_example:optimal_first}.
+	Conversely, if we minimize $\ell(\pc^p_{W_p+1})$, the write-event of $\tau_2$ and the read-event of $\tau_3$ do not align for $\pc^p_{W_p}$, as depicted in Figure~\ref{fig:automotive_example:optimal_second}.
 
+	Since it is not possible to eliminate the whole slack between write- and read-events, we cannot achieve the lower bound from Lemma~\ref{lem:lower_bound_general}.
+	Instead, we need to quantify the slack and distribute it accordingly.
+	To that end, we first examine when slack between write- and read-events occurs. 
+
+	If we consider Figure~\ref{fig:automotive_example}, we observe that we can perfectly align write-events of $\tau_1$ with read-events from $\tau_2$ because $\Tmaxone \mod T_{\tau_2} = 0$.
+	Furthermore, the jobs of $\tau_2$ that belong to $\pc^p_{W_p}$ and $\pc^p_{W_p+1}$ are exactly $\Tmaxone$ time units apart. 
+	However, since $T_{\tau_3} = \Tmaxtwo$, the read-events of $\tau_3$ are exactly $\Tmaxtwo$ time units apart. 
+	Therefore, the jobs of $\tau_3$ that belong to $\pc^p_{W_p}$ and $\pc^p_{W_p+1}$ are a multiple of $\Tmaxtwo$ time units apart, and at least for one of the two partitioned job chains, a slack between write- and read-events of at least $\Tmaxone \mod \Tmaxone$ must be added.
 	
-
-
+	We generalize this observation as follows:
+	\begin{itemize}
+		\item Whenever the cause-effect chains switches between tasks with period $\Tmaxone$ and $\Tmaxtwo$, there is a slack between write- and read-events of subsequent jobs of $\pc^p_{W_p}$ or $\pc^p_{W_p+1}$.
+		The number of switches determines the number of such slacks to be considered.
+		\item Each such slack is at least $\Tmaxone \mod \Tmaxtwo$ time units large.
+	\end{itemize}
+	We use the following notation to translate this observation into a lower bound on the end-to-end latency. 
+	The tasks that transition from period $\Tmaxone$ to period $\Tmaxtwo$ are denoted by 
+	\begin{equation}
+		\nu_E^- := \set{\tau_i \in  \Tbb_E}{ \begin{array}{l}
+			\exists j<i \colon T_{\tau_j} = \Tmaxone, T_{\tau_i} = \Tmaxtwo,
+			\\T_{\tau_{j+1}},\dots, T_{\tau_{i-1}} \notin \setof{\Tmaxone,\Tmaxtwo}
+		\end{array}
+		}.
+	\end{equation}
+	\mario{HERE}
 
 
 
