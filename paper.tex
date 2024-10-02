@@ -1089,7 +1089,7 @@
 		Therefore, $\Tbb_E$ is max-harmonic, and Theorems~\ref{thm:optimal_max_harmonic} and~\ref{thm:e2e_with_phasing_harm} can be applied.
 	\end{proof}
 
-	In the remainder of this section, we consider the case that $\Tbb_E$ is not max-harmonic. 
+	In the remainder of this section, we consider the scenario that $\Tbb_E$ is not max-harmonic. 
 	Specifically, this is achieved in the following two cases:
 	\begin{enumerate}[label=(\roman*),start=4]
 		\item $\Tmaxone = 5$ and $\Tmaxtwo=2$ \label{item:automotive_max_harm_case4}
@@ -1111,12 +1111,13 @@
 		Use Lemma~\ref{lem:repetitive}
 	\end{proof}
 
-	Therefore, to minimize the end-to-end latency, we need to minimize the maximal length of both $\pc^p_{W_p}$ and $\pc^p_{W_p+1}$.
-	However, Figure~\ref{fig:automotive_example} demonstrates that it is not possible to eliminate the slack between write- and read-events of subsequent jobs of both $\pc^p_{W_p}$ and $\pc^p_{W_p+1}$.
+	Building upon the results of the previous lemma, to minimize the end-to-end latency, we need to minimize the maximal length of both $\pc^p_{W_p}$ and $\pc^p_{W_p+1}$.
+	However, while it is possible to achieve either $\pc^p_{W_p} = \sum_{i=1}^n T_{\tau_i} + \Tmaxone$ or $\pc^p_{W_p+1} = \sum_{i=1}^n T_{\tau_i} + \Tmaxone$, 
+	Figure~\ref{fig:automotive_example} demonstrates that it is not possible to achieve both simultaneously.
 	%
 	\begin{figure}
 		\centering
-		\subfloat[Minimize $\ell(\pc^p_{W_p})$.]{
+		\subfloat[Minimize $\ell(\pc^1_{1})$.]{
 		\begin{tikzpicture}[yscale=0.25, xscale=0.27]
 
 			\begin{scope}[shift={(0,6)}] % task one
@@ -1184,7 +1185,6 @@
 				\taskname{$\tau_3$}
 								
 				\timeline{0}{23}{}
-				\labelling{0}{22}{2}{0}
 
 				\fill[color=red] (11,0) rectangle (13,1); 
 
@@ -1202,10 +1202,37 @@
 				\draw[<->] (16,1.5) -- (17,1.5);
 
 			\end{scope}
+
+			\begin{scope}[shift={(0,0)}] % task four
+				\taskname{$\tau_4$}
+								
+				\timeline{0}{23}{}
+				\labelling{0}{22}{2}{0}
+
+				\fill[color=red] (13,0) rectangle (14,1); 
+
+				\fill[color=blue] (19,0) rectangle (20,1);
+
+				\exec{9}{10}
+				\exec{10}{11}
+				\exec{11}{12}
+				\exec{12}{13}
+				\exec{13}{14}
+				\exec{14}{15}
+				\exec{15}{16}
+				\exec{16}{17}
+				\exec{17}{18}
+				\exec{18}{19}
+				\exec{19}{20}
+				\exec{20}{21}
+				\exec{21}{22}
+				\execopen{22}{22.5}
+
+			\end{scope}
 			\end{tikzpicture}	
 		\label{fig:automotive_example:optimal_first}}
 		\\
-		\subfloat[Minimize $\ell(\pc^p_{W_p+1})$.]{
+		\subfloat[Minimize $\ell(\pc^1_{2})$.]{
 			\begin{tikzpicture}[yscale=0.25, xscale=0.27]
 			\begin{scope}[shift={(0,6)}] % task one
 				\taskname{$\tau_1$}
@@ -1271,7 +1298,6 @@
 				\taskname{$\tau_3$}
 											
 				\timeline{0}{23}{}
-				\labelling{0}{22}{2}{0}
 
 				\fill[color=red] (12,0) rectangle (14,1); 
 
@@ -1290,17 +1316,70 @@
 				\draw[<->] (11,1.5) -- (12,1.5);
 
 			\end{scope}
+			\begin{scope}[shift={(0,0)}] % task four
+				\taskname{$\tau_4$}
+								
+				\timeline{0}{23}{}
+				\labelling{0}{22}{2}{0}
+
+				\fill[color=red] (14,0) rectangle (15,1); 
+
+				\fill[color=blue] (18,0) rectangle (19,1);
+
+				\exec{8}{9}
+				\exec{9}{10}
+				\exec{10}{11}
+				\exec{11}{12}
+				\exec{12}{13}
+				\exec{13}{14}
+				\exec{14}{15}
+				\exec{15}{16}
+				\exec{16}{17}
+				\exec{17}{18}
+				\exec{18}{19}
+				\exec{19}{20}
+				\exec{20}{21}
+				\exec{21}{22}
+				\execopen{22}{22.5}
+
+			\end{scope}
 			\end{tikzpicture}	
 		\label{fig:automotive_example:optimal_second}}
-		\caption{Example of three tasks demonstrating that not both $\ell(\pc^p_{W_p})$ and $\ell(\pc^p_{W_p+1})$ can be minimized simultaneously. The partitioned job chain $\pc^p_{W_p}$ is marked in red and $\pc^p_{W_p+1}$ is marked in blue. The jobs belonging to both are half red and half blue. Gaps are depicted as left-right arrows.}
+		\caption{Example of four tasks demonstrating that not both $\ell(\pc^1_{1})$ and $\ell(\pc^1_{2})$ can be minimized simultaneously. The partitioned job chain $\pc^1_{1}$ is marked in red and $\pc^1_{2}$ is marked in blue. The jobs belonging to both are half red and half blue. Gaps are depicted as left-right arrows.}
 		\label{fig:automotive_example}
 	\end{figure}
 	%
-	The example consists of a cause-effect chain $E = (\tau_1 \to \tau_2 \to \tau_3 )$ with three tasks.
-	The tasks have periods $T_{\tau_1} = 5$, $T_{\tau_2} = 1$ and $T_{\tau_3} = 2$.
+	Instead, a small gap of one time unit has to be considered either for $\pc^p_{W_p}$ or for $\pc^p_{W_p+1}$.
+	The example consists of a cause-effect chain $E = (\tau_1 \to \tau_2 \to \tau_3 \to\tau_4 )$ with four tasks.
+	The tasks have periods $T_{\tau_1} = 5$, $T_{\tau_2} = 1$, $T_{\tau_3} = 2$ and $T_{\tau_4} = 1$.
 	Therefore, that cause-effect chains falls in case \ref{item:automotive_max_harm_case4}, and $\Tbb_E$ is not max-harmonic.
-	If we minimize $\ell(\pc^p_{W_p})$, the write-event of $\tau_2$ and the read-event of $\tau_3$ do not align for $\pc^p_{W_p+1}$, as depicted in Figure~\ref{fig:automotive_example:optimal_first}.
-	Conversely, if we minimize $\ell(\pc^p_{W_p+1})$, the write-event of $\tau_2$ and the read-event of $\tau_3$ do not align for $\pc^p_{W_p}$, as depicted in Figure~\ref{fig:automotive_example:optimal_second}.
+	By definition, $p=1$ and $W_p=1$, and we consider the $1$-partitioned job chains 
+	\begin{align}
+		\pc^1_1 
+		&= ((\tau_1(j_{1,1})),(\tau_1(j'_{1,1}) \to \dots \to \tau_4(j'_{1,4})))
+		\\
+		\pc^1_2 
+		&= ((\tau_1(j_{2,1})),(\tau_1(j'_{2,1}) \to \dots \to \tau_4(j'_{2,4}))).
+	\end{align}
+	If we minimize $\ell(\pc^1_{1})$, the write-event of $\tau_2(j'_{2,2})$ and the read-event of $\tau_3(j'_{2,3})$ do not align for $\pc^1_{2}$, as depicted in Figure~\ref{fig:automotive_example:optimal_first}.
+	Conversely, if we minimize $\ell(\pc^1_{2})$, the write-event of $\tau_2(j'_{1,2})$ and the read-event of $\tau_3(j'_{1,3})$ do not align for $\pc^1_{1}$, as depicted in Figure~\ref{fig:automotive_example:optimal_second}.
+	In the following, we identify the cause for such gaps, and quantify their size.
+
+	The reason for the gaps in Figure~\ref{fig:automotive_example} is that jobs of $\tau_1$ can only be multiples of $\Tmaxone$ apart, and jobs of $\tau_3$ can only be multiples of $\Tmaxtwo$ apart. 
+	More specifically, 
+
+	More specifically, if we consider the two $1$-partitioned job chains
+	
+	then the jobs $\tau_1(j_{1,1})$ and $\tau_1(j_{2,1})$, 
+
+
+	\mario{We should lead this discussion towards
+	\begin{equation}
+		\lat(E) \geq \sum_{i=1}^n T_{\tau_i} + \Tmaxone + \min(\Tmaxone, \ceiling{\frac{\nu_E}{2}} \gamma_E)
+	\end{equation}
+	}
+
+
 
 	Since it is not possible to eliminate the whole slack between write- and read-events, we cannot achieve the lower bound from Lemma~\ref{lem:lower_bound_general}.
 	Instead, we need to quantify the slack and distribute it accordingly.
@@ -1376,6 +1455,10 @@
 Valuable extensions in future work to 
 - constrained deadline task sets
 - different communication policies like flexible LET, implicit communication
+
+
+
+- arbitrary periods: identify max-harmonic subchains, determine gap-size, try to distribute evenly. (Becomes too complex because then 3 or even more partitioned chains need to be considered for the distribution.)
 
 
 \appendix
